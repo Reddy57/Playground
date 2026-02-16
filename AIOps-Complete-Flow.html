@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIOps Architecture Flow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" />
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-elevated: #334155;
+
+            --flow-color: #2dd4bf;
+            --flow-glow: rgba(45, 212, 191, 0.4);
+
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --border-color: rgba(148, 163, 184, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Subtle background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(45, 212, 191, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(45, 212, 191, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* ============================================
+           MAIN LAYOUT - The Complete Flow View
+           ============================================ */
+
+        .flow-viewport {
+            min-height: 100vh;
+            padding: clamp(16px, 3vw, 32px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .flow-stage {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* ============================================
+           MOBILE LAYOUT - Vertical Stack
+           ============================================ */
+
+        @media (max-width: 1023px) {
+            .flow-stage {
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+            }
+
+            .sources-panel,
+            .outcomes-panel {
+                order: initial;
+            }
+
+            .architecture-panel {
+                order: 2;
+                min-height: 500px;
+            }
+
+            .sources-panel { order: 1; }
+            .outcomes-panel { order: 3; }
+        }
+
+        /* ============================================
+           DESKTOP LAYOUT - Horizontal Flow
+           ============================================ */
+
+        @media (min-width: 1024px) {
+            .flow-stage {
+                display: grid;
+                grid-template-columns: 240px 1fr 240px;
+                gap: 0;
+                align-items: center;
+                min-height: 600px;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .flow-stage {
+                grid-template-columns: 280px 1fr 280px;
+            }
+        }
+
+        /* ============================================
+           PANEL STYLING
+           ============================================ */
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: clamp(20px, 3vw, 28px);
+            position: relative;
+            z-index: 10;
+        }
+
+        .panel-header {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--flow-color);
+            margin-bottom: 6px;
+        }
+
+        .panel-title {
+            font-size: clamp(14px, 1.5vw, 16px);
+            color: var(--text-secondary);
+            margin-bottom: clamp(16px, 2vw, 24px);
+        }
+
+        /* ============================================
+           SOURCES PANEL
+           ============================================ */
+
+        .sources-panel {
+            position: relative;
+        }
+
+        .source-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        @media (min-width: 1024px) {
+            .source-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .source-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .source-chip {
+            aspect-ratio: 1;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .source-chip:hover {
+            border-color: var(--flow-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(45, 212, 191, 0.15);
+        }
+
+        .source-chip i {
+            font-size: clamp(16px, 2vw, 22px);
+            color: var(--text-muted);
+            transition: color 0.3s;
+        }
+
+        .source-chip:hover i { color: var(--text-primary); }
+
+        /* Icon brand colors */
+        .source-chip:nth-child(1) i { color: #ED1B24; }
+        .source-chip:nth-child(2) i { color: #FF9900; }
+        .source-chip:nth-child(3) i { color: #0078D4; }
+        .source-chip:nth-child(4) i { color: #FF3621; }
+        .source-chip:nth-child(5) i { color: #172B4D; }
+        .source-chip:nth-child(6) i { color: #34A853; }
+        .source-chip:nth-child(7) i { color: #00BFB3; }
+        .source-chip:nth-child(8) i { color: #4A154B; }
+        .source-chip:nth-child(9) i { color: #0052CC; }
+        .source-chip:nth-child(10) i { color: #29B5E8; }
+
+        .source-count {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .source-count .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--flow-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ============================================
+           ARCHITECTURE PANEL - The Engine
+           ============================================ */
+
+        .architecture-panel {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        @media (min-width: 1024px) {
+            .architecture-panel {
+                padding: 60px 40px;
+            }
+        }
+
+        .architecture-canvas {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 450px;
+        }
+
+        @media (min-width: 1024px) {
+            .architecture-canvas {
+                height: 400px;
+                max-width: 700px;
+            }
+        }
+
+        /* ============================================
+           SVG FLOW LINES
+           ============================================ */
+
+        .flow-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: visible;
+        }
+
+        .flow-line {
+            fill: none;
+            stroke: var(--flow-color);
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+
+        .flow-line-glow {
+            fill: none;
+            stroke: var(--flow-color);
+            stroke-width: 10;
+            stroke-linecap: round;
+            opacity: 0.2;
+            filter: blur(4px);
+        }
+
+        .flow-animated {
+            stroke-dasharray: 10 6;
+            animation: flowDash 0.8s linear infinite;
+        }
+
+        @keyframes flowDash {
+            to { stroke-dashoffset: -16; }
+        }
+
+        /* Entry/Exit flow lines (Sources → Engine → Outcomes) */
+        .flow-entry,
+        .flow-exit {
+            position: absolute;
+            height: 4px;
+            background: var(--flow-color);
+            z-index: 5;
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            .flow-entry,
+            .flow-exit {
+                display: block;
+            }
+
+            .flow-entry {
+                top: 50%;
+                left: -40px;
+                width: 40px;
+                transform: translateY(-50%);
+            }
+
+            .flow-exit {
+                top: 50%;
+                right: -40px;
+                width: 40px;
+                transform: translateY(-50%);
+            }
+        }
+
+        .flow-entry::after,
+        .flow-exit::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle, #fff 1.5px, transparent 2px);
+            background-size: 12px 4px;
+            animation: flowDash 0.6s linear infinite;
+        }
+
+        /* ============================================
+           ENGINE NODES
+           ============================================ */
+
+        .engine-node {
+            position: absolute;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .engine-node:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        .node-avatar {
+            width: clamp(70px, 12vw, 90px);
+            height: clamp(70px, 12vw, 90px);
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 3px solid var(--flow-color);
+            padding: 4px;
+            position: relative;
+            box-shadow:
+                0 0 30px var(--flow-glow),
+                0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: nodeGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes nodeGlow {
+            0%, 100% { box-shadow: 0 0 20px var(--flow-glow), 0 8px 32px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow: 0 0 40px var(--flow-glow), 0 8px 32px rgba(0, 0, 0, 0.3); }
+        }
+
+        .node-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .node-info {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .node-name {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(12px, 1.3vw, 14px);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .node-role {
+            font-size: clamp(10px, 1vw, 11px);
+            color: var(--text-muted);
+            max-width: 90px;
+            line-height: 1.3;
+        }
+
+        /* ============================================
+           NODE POSITIONS - MOBILE (Vertical Flow)
+           ============================================ */
+
+        @media (max-width: 1023px) {
+            #node-atlas { top: 12%; left: 50%; }
+            #node-merlin { top: 37%; left: 50%; }
+            #node-argus { top: 62%; left: 50%; }
+            #node-hephaestus { top: 87%; left: 50%; }
+        }
+
+        /* ============================================
+           NODE POSITIONS - DESKTOP (Pipeline Layout)
+           Original style: Horizontal trunk with branches
+
+           Layout:
+                              [MERLIN]
+                                 ▲
+           ──────► [ATLAS] ─────┼─────────────────► ──────
+                                │
+                          ┌─────┴─────┐
+                          ▼           ▼
+                      [ARGUS]   [HEPHAESTUS]
+           ============================================ */
+
+        @media (min-width: 1024px) {
+            #node-atlas {
+                top: 50%;
+                left: 15%;
+            }
+            #node-merlin {
+                top: 18%;
+                left: 50%;
+            }
+            #node-argus {
+                top: 82%;
+                left: 40%;
+            }
+            #node-hephaestus {
+                top: 82%;
+                left: 70%;
+            }
+        }
+
+        /* ============================================
+           NODE TOOLTIPS
+           ============================================ */
+
+        .node-tooltip {
+            position: absolute;
+            width: clamp(200px, 30vw, 260px);
+            background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card));
+            border: 1px solid var(--flow-color);
+            border-radius: 14px;
+            padding: 14px 16px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: all 0.3s ease;
+            z-index: 100;
+            pointer-events: none;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+        }
+
+        .node-tooltip.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .node-tooltip p {
+            font-size: clamp(12px, 1.2vw, 14px);
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Tooltip positions for desktop */
+        @media (min-width: 1024px) {
+            #tooltip-atlas {
+                bottom: calc(100% + 16px);
+                left: 50%;
+                transform: translateX(-50%) translateY(8px);
+            }
+            #tooltip-atlas.visible {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            #tooltip-merlin {
+                bottom: calc(100% + 16px);
+                left: 50%;
+                transform: translateX(-50%) translateY(8px);
+            }
+            #tooltip-merlin.visible {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            #tooltip-argus {
+                top: calc(100% + 16px);
+                left: 50%;
+                transform: translateX(-50%) translateY(-8px);
+            }
+            #tooltip-argus.visible {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            #tooltip-hephaestus {
+                top: calc(100% + 16px);
+                left: 50%;
+                transform: translateX(-50%) translateY(-8px);
+            }
+            #tooltip-hephaestus.visible {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Hide tooltips on mobile */
+        @media (max-width: 1023px) {
+            .node-tooltip { display: none; }
+            .node-role { display: none; }
+        }
+
+        /* ============================================
+           OUTCOMES PANEL
+           ============================================ */
+
+        .outcomes-panel {
+            position: relative;
+        }
+
+        .outcome-carousel {
+            height: clamp(140px, 18vh, 180px);
+            overflow: hidden;
+            mask-image: linear-gradient(to bottom,
+                transparent 0%,
+                black 15%,
+                black 85%,
+                transparent 100%);
+        }
+
+        .outcome-track {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .outcome-item {
+            height: clamp(40px, 5vh, 50px);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-size: clamp(13px, 1.3vw, 15px);
+            color: var(--text-muted);
+            transition: all 0.4s ease;
+            border-radius: 8px;
+        }
+
+        .outcome-item.active {
+            color: var(--text-primary);
+            font-weight: 600;
+            background: linear-gradient(90deg, rgba(45, 212, 191, 0.1), transparent);
+        }
+
+        .outcome-item.active::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--flow-color);
+            border-radius: 2px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .outcome-badge {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--flow-color);
+        }
+
+        .outcome-badge i {
+            font-size: 14px;
+        }
+
+        /* ============================================
+           CONNECTOR ARROWS (Desktop only)
+           Visual indicators between panels and engine
+           ============================================ */
+
+        .connector-arrow {
+            position: absolute;
+            top: 50%;
+            width: 60px;
+            height: 4px;
+            background: var(--flow-color);
+            z-index: 5;
+            display: none;
+        }
+
+        .connector-arrow::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        .connector-arrow.left {
+            right: 100%;
+            transform: translateY(-50%);
+            margin-right: -1px;
+        }
+
+        .connector-arrow.left::before {
+            right: -12px;
+            transform: translateY(-50%);
+            border-width: 8px 0 8px 12px;
+            border-color: transparent transparent transparent var(--flow-color);
+        }
+
+        .connector-arrow.right {
+            left: 100%;
+            transform: translateY(-50%);
+            margin-left: -1px;
+        }
+
+        .connector-arrow.right::before {
+            left: 100%;
+            transform: translateY(-50%);
+            border-width: 8px 0 8px 12px;
+            border-color: transparent transparent transparent var(--flow-color);
+        }
+
+        @media (min-width: 1024px) {
+            .connector-arrow {
+                display: block;
+            }
+        }
+
+        /* Flow dots animation on connectors */
+        .connector-arrow::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle, #fff 1.5px, transparent 2px);
+            background-size: 14px 4px;
+            animation: flowDash 0.6s linear infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="flow-viewport">
+        <div class="flow-stage">
+
+            <!-- ============================================
+                 SOURCES PANEL
+                 ============================================ -->
+            <div class="panel sources-panel">
+                <div class="connector-arrow right"></div>
+
+                <div class="panel-header">Sources</div>
+                <p class="panel-title">Connected Applications</p>
+
+                <div class="source-grid">
+                    <div class="source-chip" title="Splunk"><i class="fas fa-server"></i></div>
+                    <div class="source-chip" title="AWS CloudWatch"><i class="fab fa-aws"></i></div>
+                    <div class="source-chip" title="Azure Monitor"><i class="fas fa-cloud"></i></div>
+                    <div class="source-chip" title="Databricks"><i class="fas fa-cubes"></i></div>
+                    <div class="source-chip" title="Confluence"><i class="fab fa-confluence"></i></div>
+                    <div class="source-chip" title="Google Drive"><i class="fab fa-google-drive"></i></div>
+                    <div class="source-chip" title="Elasticsearch"><i class="fas fa-database"></i></div>
+                    <div class="source-chip" title="Slack"><i class="fab fa-slack"></i></div>
+                    <div class="source-chip" title="Jira"><i class="fab fa-jira"></i></div>
+                    <div class="source-chip" title="Snowflake"><i class="fas fa-snowflake"></i></div>
+                </div>
+
+                <div class="source-count">
+                    <span class="dot"></span>
+                    <span>10 integrations active</span>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 ARCHITECTURE PANEL - AI Engine
+                 ============================================ -->
+            <div class="architecture-panel">
+                <div class="architecture-canvas" id="canvas">
+
+                    <!-- Entry/Exit flow indicators -->
+                    <div class="flow-entry"></div>
+                    <div class="flow-exit"></div>
+
+                    <!-- SVG Flow Lines -->
+                    <svg class="flow-svg" id="flow-svg" preserveAspectRatio="none"></svg>
+
+                    <!-- ATLAS Node -->
+                    <div class="engine-node" id="node-atlas">
+                        <div class="node-avatar">
+                            <img src="https://imgur.com/0ya7Fj7.png" alt="Atlas"
+                                 onerror="this.src='https://placehold.co/80x80/2dd4bf/0f172a?text=A'">
+                        </div>
+                        <div class="node-info">
+                            <div class="node-name">Atlas</div>
+                            <div class="node-role">Data Integration & Enrichment</div>
+                        </div>
+                        <div class="node-tooltip" id="tooltip-atlas">
+                            <p>Efficiently ingests and normalizes diverse operational data, powering robust AI applications.</p>
+                        </div>
+                    </div>
+
+                    <!-- MERLIN Node -->
+                    <div class="engine-node" id="node-merlin">
+                        <div class="node-avatar">
+                            <img src="https://imgur.com/QyrDXOG.png" alt="Merlin"
+                                 onerror="this.src='https://placehold.co/80x80/8b5cf6/ffffff?text=M'">
+                        </div>
+                        <div class="node-info">
+                            <div class="node-name">Merlin</div>
+                            <div class="node-role">Correlation & Insights</div>
+                        </div>
+                        <div class="node-tooltip" id="tooltip-merlin">
+                            <p>Delivers instant resolution context, linking symptoms to solutions with AI insights.</p>
+                        </div>
+                    </div>
+
+                    <!-- ARGUS Node -->
+                    <div class="engine-node" id="node-argus">
+                        <div class="node-avatar">
+                            <img src="https://imgur.com/xMcN4Yw.png" alt="Argus"
+                                 onerror="this.src='https://placehold.co/80x80/f59e0b/0f172a?text=Ar'">
+                        </div>
+                        <div class="node-info">
+                            <div class="node-name">Argus</div>
+                            <div class="node-role">Noise Reduction & RCA</div>
+                        </div>
+                        <div class="node-tooltip" id="tooltip-argus">
+                            <p>Proactively signals critical anomalies, cutting through telemetry noise for faster action.</p>
+                        </div>
+                    </div>
+
+                    <!-- HEPHAESTUS Node -->
+                    <div class="engine-node" id="node-hephaestus">
+                        <div class="node-avatar">
+                            <img src="https://imgur.com/7QbiKPT.png" alt="Hephaestus"
+                                 onerror="this.src='https://placehold.co/80x80/22c55e/0f172a?text=H'">
+                        </div>
+                        <div class="node-info">
+                            <div class="node-name">Hephaestus</div>
+                            <div class="node-role">Action & Automation</div>
+                        </div>
+                        <div class="node-tooltip" id="tooltip-hephaestus">
+                            <p>Achieves rapid resilience by automating fixes and resolving issues at machine speed.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ============================================
+                 OUTCOMES PANEL
+                 ============================================ -->
+            <div class="panel outcomes-panel">
+                <div class="connector-arrow left"></div>
+
+                <div class="panel-header">Outcomes</div>
+                <p class="panel-title">Business Impact</p>
+
+                <div class="outcome-carousel">
+                    <div class="outcome-track" id="outcome-track"></div>
+                </div>
+
+                <div class="outcome-badge">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Real-time metrics</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const svg = document.getElementById('flow-svg');
+            const canvas = document.getElementById('canvas');
+
+            // ============================================
+            // GET NODE CENTER POSITION
+            // ============================================
+            function getNodeCenter(nodeId) {
+                const node = document.getElementById(nodeId);
+                const avatar = node.querySelector('.node-avatar');
+                const rect = avatar.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+
+                return {
+                    x: rect.left - canvasRect.left + rect.width / 2,
+                    y: rect.top - canvasRect.top + rect.height / 2
+                };
+            }
+
+            // ============================================
+            // DRAW FLOW CONNECTIONS
+            // ============================================
+            function drawFlowLines() {
+                const isMobile = window.innerWidth < 1024;
+
+                // Clear and add gradient def
+                svg.innerHTML = `
+                    <defs>
+                        <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.3"/>
+                            <stop offset="50%" stop-color="#2dd4bf" stop-opacity="1"/>
+                            <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0.3"/>
+                        </linearGradient>
+                    </defs>
+                `;
+
+                const atlas = getNodeCenter('node-atlas');
+                const merlin = getNodeCenter('node-merlin');
+                const argus = getNodeCenter('node-argus');
+                const hephaestus = getNodeCenter('node-hephaestus');
+
+                // Define connections based on layout
+                let connections;
+
+                if (isMobile) {
+                    // MOBILE: Simple vertical chain
+                    connections = [
+                        { from: atlas, to: merlin },
+                        { from: merlin, to: argus },
+                        { from: argus, to: hephaestus }
+                    ];
+                } else {
+                    // DESKTOP: Pipeline with branches
+                    // Atlas → Merlin (up)
+                    // Atlas → Argus (down-right)
+                    // Atlas → Hephaestus (through trunk)
+                    // Merlin → Hephaestus (down)
+                    // Argus → Hephaestus (right)
+
+                    const trunkY = atlas.y; // Main horizontal trunk line
+
+                    connections = [
+                        // Main trunk: Atlas to right edge
+                        {
+                            from: atlas,
+                            to: { x: canvas.offsetWidth - 20, y: trunkY },
+                            type: 'trunk'
+                        },
+                        // Atlas to Merlin (branch up)
+                        {
+                            from: { x: merlin.x, y: trunkY },
+                            to: merlin,
+                            type: 'branch-up'
+                        },
+                        // Trunk to Argus (branch down)
+                        {
+                            from: { x: argus.x, y: trunkY },
+                            to: argus,
+                            type: 'branch-down'
+                        },
+                        // Trunk to Hephaestus (branch down)
+                        {
+                            from: { x: hephaestus.x, y: trunkY },
+                            to: hephaestus,
+                            type: 'branch-down'
+                        }
+                    ];
+                }
+
+                // Draw each connection
+                connections.forEach(conn => {
+                    let d;
+
+                    if (conn.type === 'trunk') {
+                        // Straight horizontal line
+                        d = `M ${conn.from.x} ${conn.from.y} L ${conn.to.x} ${conn.to.y}`;
+                    } else if (conn.type === 'branch-up' || conn.type === 'branch-down') {
+                        // Vertical branch
+                        d = `M ${conn.from.x} ${conn.from.y} L ${conn.to.x} ${conn.to.y}`;
+                    } else {
+                        // Curved connection (mobile)
+                        const midX = (conn.from.x + conn.to.x) / 2;
+                        const midY = (conn.from.y + conn.to.y) / 2;
+                        d = `M ${conn.from.x} ${conn.from.y} L ${conn.to.x} ${conn.to.y}`;
+                    }
+
+                    // Glow line
+                    const glow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    glow.setAttribute('class', 'flow-line-glow');
+                    glow.setAttribute('d', d);
+                    svg.appendChild(glow);
+
+                    // Main animated line
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    line.setAttribute('class', 'flow-line flow-animated');
+                    line.setAttribute('d', d);
+                    svg.appendChild(line);
+                });
+            }
+
+            // Initial draw with delay for DOM
+            setTimeout(drawFlowLines, 150);
+
+            // Redraw on resize
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(drawFlowLines, 100);
+            });
+
+            // ============================================
+            // TOOLTIP CYCLING
+            // ============================================
+            const nodeIds = ['node-atlas', 'node-merlin', 'node-argus', 'node-hephaestus'];
+            const tooltipIds = ['tooltip-atlas', 'tooltip-merlin', 'tooltip-argus', 'tooltip-hephaestus'];
+            let currentTooltip = 0;
+            let tooltipInterval;
+
+            function showTooltip(index) {
+                tooltipIds.forEach((id, i) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.classList.toggle('visible', i === index);
+                    }
+                });
+            }
+
+            function cycleTooltips() {
+                if (window.innerWidth < 1024) {
+                    tooltipIds.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.remove('visible');
+                    });
+                    return;
+                }
+                showTooltip(currentTooltip);
+                currentTooltip = (currentTooltip + 1) % nodeIds.length;
+            }
+
+            // Hover interactions
+            nodeIds.forEach((id, index) => {
+                const node = document.getElementById(id);
+                if (node) {
+                    node.addEventListener('mouseenter', () => {
+                        clearInterval(tooltipInterval);
+                        showTooltip(index);
+                    });
+                    node.addEventListener('mouseleave', () => {
+                        tooltipInterval = setInterval(cycleTooltips, 4000);
+                    });
+                }
+            });
+
+            // Start auto-cycling on desktop
+            if (window.innerWidth >= 1024) {
+                tooltipInterval = setInterval(cycleTooltips, 4000);
+                setTimeout(cycleTooltips, 500);
+            }
+
+            window.addEventListener('resize', () => {
+                clearInterval(tooltipInterval);
+                if (window.innerWidth >= 1024) {
+                    tooltipInterval = setInterval(cycleTooltips, 4000);
+                }
+            });
+
+            // ============================================
+            // OUTCOMES CAROUSEL
+            // ============================================
+            const outcomes = [
+                "Faster Incident Resolution",
+                "Enhanced Operational Efficiency",
+                "Improved System Reliability",
+                "Reduced Operational Costs",
+                "Context-aware Correlation",
+                "Real-time On-call Guidance",
+                "Predictive Log Analytics",
+                "Anomaly Detection",
+                "Root Cause Analysis"
+            ];
+
+            const track = document.getElementById('outcome-track');
+            const tripled = [...outcomes, ...outcomes, ...outcomes];
+
+            tripled.forEach(text => {
+                const item = document.createElement('div');
+                item.className = 'outcome-item';
+                item.textContent = text;
+                track.appendChild(item);
+            });
+
+            const items = track.querySelectorAll('.outcome-item');
+            let outcomeIndex = outcomes.length;
+            const itemHeight = 45;
+
+            function updateOutcomes() {
+                track.style.transition = 'transform 0.5s ease';
+                track.style.transform = `translateY(-${outcomeIndex * itemHeight}px)`;
+
+                items.forEach((item, i) => {
+                    item.classList.toggle('active', i === outcomeIndex + 1);
+                });
+            }
+
+            function advanceOutcome() {
+                outcomeIndex++;
+                updateOutcomes();
+
+                if (outcomeIndex >= outcomes.length * 2) {
+                    setTimeout(() => {
+                        track.style.transition = 'none';
+                        outcomeIndex = outcomes.length;
+                        track.style.transform = `translateY(-${outcomeIndex * itemHeight}px)`;
+                    }, 500);
+                }
+            }
+
+            updateOutcomes();
+            setInterval(advanceOutcome, 3000);
+        });
+    </script>
+</body>
+</html>
