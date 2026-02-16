@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIOps Architecture Flow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        :root {
+            /* Color System */
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2332;
+            --bg-elevated: #243044;
+
+            --accent-teal: #2dd4bf;
+            --accent-teal-glow: rgba(45, 212, 191, 0.4);
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-amber: #f59e0b;
+
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --border-subtle: rgba(148, 163, 184, 0.1);
+            --border-accent: rgba(45, 212, 191, 0.3);
+
+            /* Fluid Typography */
+            --font-xs: clamp(0.65rem, 0.6rem + 0.25vw, 0.75rem);
+            --font-sm: clamp(0.75rem, 0.7rem + 0.3vw, 0.875rem);
+            --font-base: clamp(0.875rem, 0.8rem + 0.4vw, 1rem);
+            --font-lg: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+            --font-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.75rem);
+
+            /* Spacing */
+            --space-unit: clamp(0.5rem, 0.4rem + 0.5vw, 1rem);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Subtle grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(45, 212, 191, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(45, 212, 191, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Gradient orbs */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(45, 212, 191, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-orb-right {
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Main Layout */
+        .main-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: var(--space-unit);
+        }
+
+        .flow-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr auto;
+            gap: calc(var(--space-unit) * 2);
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            padding: var(--space-unit);
+        }
+
+        /* Tablet+ Layout */
+        @media (min-width: 768px) {
+            .flow-container {
+                grid-template-columns: 1fr 1.5fr 1fr;
+                grid-template-rows: 1fr;
+                align-items: center;
+                min-height: 80vh;
+            }
+        }
+
+        /* Section Panels */
+        .section-panel {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border: 1px solid var(--border-subtle);
+            border-radius: clamp(12px, 2vw, 24px);
+            padding: calc(var(--space-unit) * 1.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-teal), transparent);
+            opacity: 0.5;
+        }
+
+        .section-header {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: var(--font-xs);
+            font-weight: 600;
+            color: var(--accent-teal);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: calc(var(--space-unit) * 0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-header::before {
+            content: '//';
+            opacity: 0.5;
+        }
+
+        .section-subheader {
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+            margin-bottom: calc(var(--space-unit) * 1.5);
+            line-height: 1.4;
+        }
+
+        /* Sources - Logo Cloud */
+        .sources-section {
+            order: 1;
+        }
+
+        @media (min-width: 768px) {
+            .sources-section {
+                order: 1;
+            }
+        }
+
+        .logo-cloud {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(8px, 1.5vw, 16px);
+        }
+
+        @media (min-width: 768px) {
+            .logo-cloud {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .logo-cloud {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .logo-card {
+            aspect-ratio: 1;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: clamp(8px, 1.5vw, 12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 40%, rgba(45, 212, 191, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .logo-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-accent);
+            box-shadow: 0 8px 32px rgba(45, 212, 191, 0.15);
+        }
+
+        .logo-card:hover::after {
+            opacity: 1;
+        }
+
+        .logo-icon {
+            font-size: clamp(1.25rem, 2vw, 1.75rem);
+            color: var(--text-secondary);
+            transition: color 0.3s;
+            z-index: 1;
+        }
+
+        .logo-card:hover .logo-icon {
+            color: var(--text-primary);
+        }
+
+        /* Icon Colors */
+        .logo-card:nth-child(1) .logo-icon { color: #ED1B24; }
+        .logo-card:nth-child(2) .logo-icon { color: #FF9900; }
+        .logo-card:nth-child(3) .logo-icon { color: #0078D4; }
+        .logo-card:nth-child(4) .logo-icon { color: #FF3621; }
+        .logo-card:nth-child(5) .logo-icon { color: #172B4D; }
+        .logo-card:nth-child(6) .logo-icon { color: #34A853; }
+        .logo-card:nth-child(7) .logo-icon { color: #00BFB3; }
+        .logo-card:nth-child(8) .logo-icon { color: #4A154B; }
+        .logo-card:nth-child(9) .logo-icon { color: #0052CC; }
+        .logo-card:nth-child(10) .logo-icon { color: #29B5E8; }
+
+        /* Architecture Diagram Section */
+        .diagram-section {
+            order: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: calc(var(--space-unit) * 2);
+            min-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .diagram-section {
+                order: 2;
+                min-height: 500px;
+            }
+        }
+
+        .architecture-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1;
+        }
+
+        /* SVG Connection Lines */
+        .connection-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .connection-line {
+            stroke: var(--accent-teal);
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-dasharray: 8 4;
+            animation: flowDash 1s linear infinite;
+        }
+
+        @keyframes flowDash {
+            to {
+                stroke-dashoffset: -12;
+            }
+        }
+
+        .connection-line-glow {
+            stroke: var(--accent-teal);
+            stroke-width: 8;
+            fill: none;
+            stroke-linecap: round;
+            opacity: 0.2;
+            filter: blur(4px);
+        }
+
+        /* Engine Nodes */
+        .engine-node {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .engine-node:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        .node-avatar {
+            width: clamp(60px, 12vw, 90px);
+            height: clamp(60px, 12vw, 90px);
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 3px solid var(--accent-teal);
+            padding: 4px;
+            position: relative;
+            box-shadow:
+                0 0 0 1px var(--border-subtle),
+                0 0 30px var(--accent-teal-glow),
+                0 8px 32px rgba(0, 0, 0, 0.4);
+            animation: nodeGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes nodeGlow {
+            0%, 100% {
+                box-shadow:
+                    0 0 0 1px var(--border-subtle),
+                    0 0 20px var(--accent-teal-glow),
+                    0 8px 32px rgba(0, 0, 0, 0.4);
+            }
+            50% {
+                box-shadow:
+                    0 0 0 1px var(--border-subtle),
+                    0 0 40px var(--accent-teal-glow),
+                    0 8px 32px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        .node-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .node-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: var(--font-sm);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .node-description {
+            font-size: var(--font-xs);
+            color: var(--text-muted);
+            text-align: center;
+            max-width: 100px;
+            line-height: 1.3;
+        }
+
+        /* Node Positions - Mobile (Vertical) */
+        #atlas-node { top: 15%; left: 50%; }
+        #merlin-node { top: 40%; left: 50%; }
+        #argus-node { top: 65%; left: 50%; }
+        #hephaestus-node { top: 90%; left: 50%; }
+
+        /* Node Positions - Desktop (Pipeline Layout) */
+        @media (min-width: 768px) {
+            #atlas-node { top: 50%; left: 12%; }
+            #merlin-node { top: 20%; left: 55%; }
+            #argus-node { top: 80%; left: 40%; }
+            #hephaestus-node { top: 80%; left: 75%; }
+        }
+
+        /* Node Tooltip Popups */
+        .node-tooltip {
+            position: absolute;
+            bottom: calc(100% + 16px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            width: clamp(200px, 40vw, 260px);
+            background: linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-accent);
+            border-radius: 12px;
+            padding: 14px 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+        }
+
+        .node-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: var(--bg-card);
+        }
+
+        .node-tooltip.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .node-tooltip p {
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Position tooltips below for bottom nodes */
+        .tooltip-bottom {
+            bottom: auto;
+            top: calc(100% + 16px);
+        }
+
+        .tooltip-bottom::after {
+            top: auto;
+            bottom: 100%;
+            border-top-color: transparent;
+            border-bottom-color: var(--bg-card);
+        }
+
+        /* Outcomes Section */
+        .outcomes-section {
+            order: 3;
+        }
+
+        .carousel-container {
+            position: relative;
+            height: clamp(120px, 20vh, 180px);
+            overflow: hidden;
+            mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+        }
+
+        .carousel-track {
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .carousel-item {
+            height: clamp(36px, 6vh, 48px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 1rem;
+            font-size: var(--font-sm);
+            color: var(--text-muted);
+            transition: all 0.4s ease;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .carousel-item.active {
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: var(--font-base);
+        }
+
+        .carousel-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 60%;
+            background: var(--accent-teal);
+            border-radius: 2px;
+        }
+
+        /* Status indicator */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: calc(var(--space-unit) * 1.5);
+            padding-top: calc(var(--space-unit));
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-teal);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.9); }
+        }
+
+        .status-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: var(--font-xs);
+            color: var(--text-muted);
+        }
+
+        /* Flow indicator labels */
+        .flow-label {
+            position: absolute;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--accent-teal);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .flow-label {
+                display: block;
+            }
+        }
+
+        .flow-label-input {
+            top: 50%;
+            left: -8%;
+            transform: translateY(-50%) rotate(-90deg);
+        }
+
+        .flow-label-output {
+            top: 50%;
+            right: -10%;
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767px) {
+            .architecture-wrapper {
+                max-width: 280px;
+            }
+
+            .node-description {
+                display: none;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .flow-container {
+                gap: calc(var(--space-unit) * 3);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glow-orb-right"></div>
+
+    <div class="main-wrapper">
+        <div class="flow-container">
+
+            <!-- Sources Section -->
+            <div class="section-panel sources-section">
+                <h3 class="section-header">Sources</h3>
+                <p class="section-subheader">Harmonizing with your essential applications</p>
+
+                <div class="logo-cloud">
+                    <div class="logo-card"><i class="fas fa-server logo-icon" title="Splunk"></i></div>
+                    <div class="logo-card"><i class="fab fa-aws logo-icon" title="AWS CloudWatch"></i></div>
+                    <div class="logo-card"><i class="fas fa-cloud logo-icon" title="Azure"></i></div>
+                    <div class="logo-card"><i class="fas fa-cubes logo-icon" title="Databricks"></i></div>
+                    <div class="logo-card"><i class="fab fa-confluence logo-icon" title="Confluence"></i></div>
+                    <div class="logo-card"><i class="fab fa-google-drive logo-icon" title="Google Drive"></i></div>
+                    <div class="logo-card"><i class="fas fa-database logo-icon" title="Elasticsearch"></i></div>
+                    <div class="logo-card"><i class="fab fa-slack logo-icon" title="Slack"></i></div>
+                    <div class="logo-card"><i class="fab fa-jira logo-icon" title="Jira"></i></div>
+                    <div class="logo-card"><i class="fas fa-snowflake logo-icon" title="Snowflake"></i></div>
+                </div>
+
+                <div class="status-bar">
+                    <span class="status-dot"></span>
+                    <span class="status-text">10 integrations active</span>
+                </div>
+            </div>
+
+            <!-- Architecture Diagram Section -->
+            <div class="diagram-section">
+                <div class="architecture-wrapper" id="architecture">
+                    <span class="flow-label flow-label-input">Data In</span>
+                    <span class="flow-label flow-label-output">Actions Out</span>
+
+                    <!-- SVG Connections - Will be drawn by JS for responsiveness -->
+                    <svg class="connection-svg" id="connections-svg" preserveAspectRatio="none"></svg>
+
+                    <!-- Engine Nodes -->
+                    <div class="engine-node" id="atlas-node">
+                        <div class="node-avatar">
+                            <img src="https://imgur.com/0ya7Fj7.png" alt="Atlas" onerror="this.style.display='none'">
+                        </div>
+                        <div class="node-label">Atlas</div>
+                        <div class="node-description">Data Integration & Enrichment</div>
+                        <div class="node-tooltip">
+                            <p>Efficiently ingests and normalizes diverse operational data, powering robust AI applications.</p>
+                        </div>
+                    </div>
+
+                    <div class="engine-node" id="merlin-node">
+                        <div class="node-avatar">
+                            <img src="https://imgur.com/QyrDXOG.png" alt="Merlin" onerror="this.style.display='none'">
+                        </div>
+                        <div class="node-label">Merlin</div>
+                        <div class="node-description">Correlation & Insights</div>
+                        <div class="node-tooltip">
+                            <p>Delivers instant resolution context, linking symptoms to solutions with AI insights.</p>
+                        </div>
+                    </div>
+
+                    <div class="engine-node" id="argus-node">
+                        <div class="node-avatar">
+                            <img src="https://imgur.com/xMcN4Yw.png" alt="Argus" onerror="this.style.display='none'">
+                        </div>
+                        <div class="node-label">Argus</div>
+                        <div class="node-description">Noise Reduction & RCA</div>
+                        <div class="node-tooltip tooltip-bottom">
+                            <p>Proactively signals critical anomalies, cutting through telemetry noise for faster action.</p>
+                        </div>
+                    </div>
+
+                    <div class="engine-node" id="hephaestus-node">
+                        <div class="node-avatar">
+                            <img src="https://imgur.com/7QbiKPT.png" alt="Hephaestus" onerror="this.style.display='none'">
+                        </div>
+                        <div class="node-label">Hephaestus</div>
+                        <div class="node-description">Action & Automation</div>
+                        <div class="node-tooltip tooltip-bottom">
+                            <p>Achieves rapid resilience by automating fixes and resolving issues at machine speed.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outcomes Section -->
+            <div class="section-panel outcomes-section">
+                <h3 class="section-header">Outcomes</h3>
+                <p class="section-subheader">Value realized by business</p>
+
+                <div class="carousel-container">
+                    <div class="carousel-track" id="carousel-track"></div>
+                </div>
+
+                <div class="status-bar">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Real-time metrics</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // === SVG Connection Drawing ===
+            const svg = document.getElementById('connections-svg');
+            const wrapper = document.getElementById('architecture');
+
+            function getNodeCenter(nodeId) {
+                const node = document.getElementById(nodeId);
+                const avatar = node.querySelector('.node-avatar');
+                const rect = avatar.getBoundingClientRect();
+                const wrapperRect = wrapper.getBoundingClientRect();
+
+                return {
+                    x: rect.left - wrapperRect.left + rect.width / 2,
+                    y: rect.top - wrapperRect.top + rect.height / 2
+                };
+            }
+
+            function drawConnections() {
+                const isMobile = window.innerWidth < 768;
+                svg.innerHTML = '';
+
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+
+                // Gradient for lines
+                const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+                gradient.setAttribute('id', 'lineGradient');
+                gradient.innerHTML = `
+                    <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.3"/>
+                    <stop offset="50%" stop-color="#2dd4bf" stop-opacity="1"/>
+                    <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0.3"/>
+                `;
+                defs.appendChild(gradient);
+                svg.appendChild(defs);
+
+                const atlas = getNodeCenter('atlas-node');
+                const merlin = getNodeCenter('merlin-node');
+                const argus = getNodeCenter('argus-node');
+                const hephaestus = getNodeCenter('hephaestus-node');
+
+                const connections = isMobile ? [
+                    // Vertical flow for mobile
+                    { from: atlas, to: merlin },
+                    { from: merlin, to: argus },
+                    { from: argus, to: hephaestus }
+                ] : [
+                    // Pipeline layout for desktop
+                    { from: atlas, to: merlin, curve: true, direction: 'up' },
+                    { from: atlas, to: argus, curve: true, direction: 'down' },
+                    { from: merlin, to: hephaestus, curve: true, direction: 'down' },
+                    { from: argus, to: hephaestus, curve: false }
+                ];
+
+                connections.forEach(conn => {
+                    // Glow line
+                    const glowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    glowPath.setAttribute('class', 'connection-line-glow');
+
+                    // Main line
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('class', 'connection-line');
+
+                    let d;
+                    if (isMobile) {
+                        // Straight vertical lines
+                        d = `M ${conn.from.x} ${conn.from.y} L ${conn.to.x} ${conn.to.y}`;
+                    } else if (conn.curve) {
+                        // Curved paths for desktop
+                        const midX = (conn.from.x + conn.to.x) / 2;
+                        const midY = (conn.from.y + conn.to.y) / 2;
+                        const controlOffset = conn.direction === 'up' ? -40 : 40;
+                        d = `M ${conn.from.x} ${conn.from.y} Q ${midX} ${midY + controlOffset} ${conn.to.x} ${conn.to.y}`;
+                    } else {
+                        // Straight horizontal
+                        d = `M ${conn.from.x} ${conn.from.y} L ${conn.to.x} ${conn.to.y}`;
+                    }
+
+                    glowPath.setAttribute('d', d);
+                    path.setAttribute('d', d);
+
+                    svg.appendChild(glowPath);
+                    svg.appendChild(path);
+                });
+            }
+
+            // Initial draw
+            setTimeout(drawConnections, 100);
+
+            // Redraw on resize
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(drawConnections, 150);
+            });
+
+            // === Tooltip Animation ===
+            const nodes = document.querySelectorAll('.engine-node');
+            let tooltipIndex = 0;
+            let tooltipInterval;
+
+            function showTooltip(index) {
+                nodes.forEach((node, i) => {
+                    const tooltip = node.querySelector('.node-tooltip');
+                    if (i === index) {
+                        tooltip.classList.add('active');
+                    } else {
+                        tooltip.classList.remove('active');
+                    }
+                });
+            }
+
+            function cycleTooltips() {
+                if (window.innerWidth < 768) {
+                    nodes.forEach(node => {
+                        node.querySelector('.node-tooltip').classList.remove('active');
+                    });
+                    return;
+                }
+
+                showTooltip(tooltipIndex);
+                tooltipIndex = (tooltipIndex + 1) % nodes.length;
+            }
+
+            // Hover interactions
+            nodes.forEach((node, index) => {
+                node.addEventListener('mouseenter', () => {
+                    clearInterval(tooltipInterval);
+                    showTooltip(index);
+                });
+
+                node.addEventListener('mouseleave', () => {
+                    tooltipInterval = setInterval(cycleTooltips, 4000);
+                });
+            });
+
+            // Start auto-cycling
+            if (window.innerWidth >= 768) {
+                tooltipInterval = setInterval(cycleTooltips, 4000);
+                cycleTooltips();
+            }
+
+            window.addEventListener('resize', () => {
+                clearInterval(tooltipInterval);
+                if (window.innerWidth >= 768) {
+                    tooltipInterval = setInterval(cycleTooltips, 4000);
+                } else {
+                    nodes.forEach(node => {
+                        node.querySelector('.node-tooltip').classList.remove('active');
+                    });
+                }
+            });
+
+            // === Carousel ===
+            const phrases = [
+                "Faster Incident Resolution",
+                "Enhanced Operational Efficiency",
+                "Improved System Reliability",
+                "Reduced Operational Costs",
+                "Context-aware Correlation",
+                "Real-time On-call Guidance",
+                "Predictive Log Analytics",
+                "Anomaly Detection",
+                "Root Cause Analysis"
+            ];
+
+            const track = document.getElementById('carousel-track');
+            const itemHeight = window.innerWidth < 768 ? 36 : 48;
+            let currentIndex = 0;
+
+            // Create items (triple for seamless loop)
+            const allPhrases = [...phrases, ...phrases, ...phrases];
+            allPhrases.forEach((phrase, i) => {
+                const item = document.createElement('div');
+                item.className = 'carousel-item';
+                item.textContent = phrase;
+                track.appendChild(item);
+            });
+
+            const items = track.querySelectorAll('.carousel-item');
+            currentIndex = phrases.length;
+
+            function updateCarousel() {
+                // Update heights based on viewport
+                const currentItemHeight = window.innerWidth < 768 ? 36 : 48;
+
+                track.style.transform = `translateY(-${currentIndex * currentItemHeight}px)`;
+
+                items.forEach((item, i) => {
+                    item.classList.remove('active');
+                    if (i === currentIndex + 1) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            function advanceCarousel() {
+                currentIndex++;
+                track.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                updateCarousel();
+
+                if (currentIndex >= phrases.length * 2) {
+                    setTimeout(() => {
+                        track.style.transition = 'none';
+                        currentIndex = phrases.length;
+                        updateCarousel();
+                    }, 600);
+                }
+            }
+
+            // Initial position
+            updateCarousel();
+
+            // Auto-advance
+            setInterval(advanceCarousel, 3000);
+        });
+    </script>
+</body>
+</html>

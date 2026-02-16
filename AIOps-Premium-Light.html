@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIOps Architecture Flow - Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" />
+
+    <style>
+        :root {
+            --bg-base: #fafbfc;
+            --bg-elevated: #ffffff;
+            --bg-subtle: #f1f5f9;
+
+            --accent-primary: #0ea5e9;
+            --accent-secondary: #6366f1;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+
+            --border-default: #e2e8f0;
+            --border-accent: rgba(14, 165, 233, 0.3);
+
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --shadow-glow: 0 0 40px rgba(14, 165, 233, 0.15);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* Decorative background elements */
+        .bg-decoration {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .bg-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+        }
+
+        .bg-blob-1 {
+            top: -10%;
+            right: -5%;
+            width: 40vw;
+            height: 40vw;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(99, 102, 241, 0.1));
+        }
+
+        .bg-blob-2 {
+            bottom: -15%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(14, 165, 233, 0.1));
+        }
+
+        /* Layout */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            padding: clamp(16px, 4vw, 40px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(20px, 4vw, 40px);
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (min-width: 900px) {
+            .content-grid {
+                grid-template-columns: 280px 1fr 280px;
+                align-items: center;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 320px 1fr 320px;
+            }
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            padding: clamp(20px, 3vw, 32px);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 24px;
+            right: 24px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 0 0 4px 4px;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(11px, 1.2vw, 13px);
+            font-weight: 600;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .section-subtitle {
+            font-size: clamp(13px, 1.4vw, 15px);
+            color: var(--text-secondary);
+            margin-bottom: clamp(16px, 2.5vw, 24px);
+        }
+
+        /* Sources Section */
+        .sources-section {
+            order: 1;
+        }
+
+        @media (min-width: 900px) {
+            .sources-section { order: 1; }
+        }
+
+        .integration-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: clamp(8px, 1vw, 12px);
+        }
+
+        @media (min-width: 900px) {
+            .integration-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .integration-chip {
+            aspect-ratio: 1;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .integration-chip:hover {
+            background: var(--bg-elevated);
+            border-color: var(--border-accent);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+        }
+
+        .integration-chip i {
+            font-size: clamp(18px, 2vw, 24px);
+            transition: transform 0.25s;
+        }
+
+        .integration-chip:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Icon colors */
+        .integration-chip:nth-child(1) i { color: #ED1B24; }
+        .integration-chip:nth-child(2) i { color: #FF9900; }
+        .integration-chip:nth-child(3) i { color: #0078D4; }
+        .integration-chip:nth-child(4) i { color: #FF3621; }
+        .integration-chip:nth-child(5) i { color: #172B4D; }
+        .integration-chip:nth-child(6) i { color: #34A853; }
+        .integration-chip:nth-child(7) i { color: #00BFB3; }
+        .integration-chip:nth-child(8) i { color: #4A154B; }
+        .integration-chip:nth-child(9) i { color: #0052CC; }
+        .integration-chip:nth-child(10) i { color: #29B5E8; }
+
+        .integration-count {
+            margin-top: clamp(12px, 2vw, 20px);
+            font-size: clamp(12px, 1.3vw, 14px);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .integration-count strong {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        /* Diagram Section */
+        .diagram-section {
+            order: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(20px, 4vw, 60px) 0;
+        }
+
+        .diagram-canvas {
+            position: relative;
+            width: 100%;
+            max-width: 550px;
+            aspect-ratio: 1.2;
+        }
+
+        @media (min-width: 900px) {
+            .diagram-canvas {
+                aspect-ratio: 1.4;
+            }
+        }
+
+        /* Connection Lines SVG */
+        .connections-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        .connection-path {
+            fill: none;
+            stroke: url(#connectionGradient);
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+
+        .connection-path-bg {
+            fill: none;
+            stroke: var(--border-default);
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+
+        .connection-animated {
+            stroke-dasharray: 12 8;
+            animation: flowAnimation 1.2s linear infinite;
+        }
+
+        @keyframes flowAnimation {
+            to { stroke-dashoffset: -20; }
+        }
+
+        /* Engine Nodes */
+        .engine-node {
+            position: absolute;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .engine-node:hover {
+            transform: translate(-50%, -50%) scale(1.08);
+        }
+
+        .node-ring {
+            position: relative;
+            width: clamp(70px, 14vw, 100px);
+            height: clamp(70px, 14vw, 100px);
+            border-radius: 50%;
+            background: var(--bg-elevated);
+            border: 3px solid var(--accent-primary);
+            box-shadow:
+                var(--shadow-lg),
+                0 0 0 8px rgba(14, 165, 233, 0.1),
+                inset 0 0 20px rgba(14, 165, 233, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .engine-node:hover .node-ring {
+            box-shadow:
+                var(--shadow-lg),
+                0 0 0 12px rgba(14, 165, 233, 0.15),
+                0 0 40px rgba(14, 165, 233, 0.2),
+                inset 0 0 20px rgba(14, 165, 233, 0.05);
+        }
+
+        .node-ring img {
+            width: 75%;
+            height: 75%;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        .node-info {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .node-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(13px, 1.4vw, 16px);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .node-role {
+            font-size: clamp(10px, 1.1vw, 12px);
+            color: var(--text-muted);
+            max-width: 100px;
+            line-height: 1.3;
+        }
+
+        /* Node Positions - Mobile (Vertical) */
+        #node-atlas { top: 12%; left: 50%; }
+        #node-merlin { top: 38%; left: 50%; }
+        #node-argus { top: 64%; left: 50%; }
+        #node-hephaestus { top: 90%; left: 50%; }
+
+        /* Node Positions - Desktop */
+        @media (min-width: 900px) {
+            #node-atlas { top: 50%; left: 10%; }
+            #node-merlin { top: 18%; left: 50%; }
+            #node-argus { top: 82%; left: 40%; }
+            #node-hephaestus { top: 82%; left: 72%; }
+        }
+
+        /* Insight Cards (Tooltips) */
+        .insight-card {
+            position: absolute;
+            width: clamp(180px, 30vw, 240px);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: 14px 16px;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .insight-card.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .insight-card p {
+            font-size: clamp(12px, 1.2vw, 14px);
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-default);
+            border-right: none;
+            border-top: none;
+            transform: rotate(45deg);
+        }
+
+        .insight-top::before {
+            bottom: -7px;
+            left: 50%;
+            margin-left: -6px;
+            transform: rotate(-45deg);
+        }
+
+        .insight-bottom::before {
+            top: -7px;
+            left: 50%;
+            margin-left: -6px;
+            transform: rotate(135deg);
+        }
+
+        /* Outcomes Section */
+        .outcomes-section {
+            order: 3;
+        }
+
+        .outcome-carousel {
+            position: relative;
+            height: clamp(140px, 20vh, 200px);
+            overflow: hidden;
+            mask-image: linear-gradient(to bottom,
+                transparent 0%,
+                black 15%,
+                black 85%,
+                transparent 100%);
+        }
+
+        .outcome-track {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .outcome-item {
+            height: clamp(40px, 5vh, 50px);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-size: clamp(13px, 1.3vw, 15px);
+            color: var(--text-muted);
+            transition: all 0.4s ease;
+            border-radius: var(--radius-sm);
+            margin: 2px 0;
+        }
+
+        .outcome-item.active {
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.1), transparent);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .outcome-item.active::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary));
+            border-radius: 2px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .outcome-badge {
+            margin-top: clamp(16px, 2.5vw, 24px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(14, 165, 233, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 100px;
+            font-size: clamp(11px, 1.2vw, 13px);
+            color: var(--accent-success);
+            font-weight: 500;
+        }
+
+        .outcome-badge i {
+            font-size: 14px;
+        }
+
+        /* Hide node role text on mobile */
+        @media (max-width: 899px) {
+            .node-role {
+                display: none;
+            }
+
+            .insight-card {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-decoration">
+        <div class="bg-blob bg-blob-1"></div>
+        <div class="bg-blob bg-blob-2"></div>
+    </div>
+
+    <div class="app-container">
+        <div class="content-grid">
+
+            <!-- Sources Panel -->
+            <div class="section-card sources-section">
+                <h2 class="section-title">Sources</h2>
+                <p class="section-subtitle">Harmonizing with your essential applications</p>
+
+                <div class="integration-grid">
+                    <div class="integration-chip"><i class="fas fa-server"></i></div>
+                    <div class="integration-chip"><i class="fab fa-aws"></i></div>
+                    <div class="integration-chip"><i class="fas fa-cloud"></i></div>
+                    <div class="integration-chip"><i class="fas fa-cubes"></i></div>
+                    <div class="integration-chip"><i class="fab fa-confluence"></i></div>
+                    <div class="integration-chip"><i class="fab fa-google-drive"></i></div>
+                    <div class="integration-chip"><i class="fas fa-database"></i></div>
+                    <div class="integration-chip"><i class="fab fa-slack"></i></div>
+                    <div class="integration-chip"><i class="fab fa-jira"></i></div>
+                    <div class="integration-chip"><i class="fas fa-snowflake"></i></div>
+                </div>
+
+                <p class="integration-count">
+                    <i class="fas fa-plug"></i>
+                    <strong>10</strong> active integrations
+                </p>
+            </div>
+
+            <!-- Architecture Diagram -->
+            <div class="diagram-section">
+                <div class="diagram-canvas" id="diagram">
+
+                    <!-- SVG Connections -->
+                    <svg class="connections-layer" id="svg-connections" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#0ea5e9" />
+                                <stop offset="100%" stop-color="#6366f1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+
+                    <!-- Engine Nodes -->
+                    <div class="engine-node" id="node-atlas">
+                        <div class="node-ring">
+                            <img src="https://imgur.com/0ya7Fj7.png" alt="Atlas" onerror="this.src='https://placehold.co/80x80/0ea5e9/white?text=A'">
+                        </div>
+                        <div class="node-info">
+                            <div class="node-name">Atlas</div>
+                            <div class="node-role">Data Integration</div>
+                        </div>
+                    </div>
+
+                    <div class="engine-node" id="node-merlin">
+                        <div class="node-ring">
+                            <img src="https://imgur.com/QyrDXOG.png" alt="Merlin" onerror="this.src='https://placehold.co/80x80/6366f1/white?text=M'">
+                        </div>
+                        <div class="node-info">
+                            <div class="node-name">Merlin</div>
+                            <div class="node-role">Correlation & Insights</div>
+                        </div>
+                    </div>
+
+                    <div class="engine-node" id="node-argus">
+                        <div class="node-ring">
+                            <img src="https://imgur.com/xMcN4Yw.png" alt="Argus" onerror="this.src='https://placehold.co/80x80/f59e0b/white?text=Ar'">
+                        </div>
+                        <div class="node-info">
+                            <div class="node-name">Argus</div>
+                            <div class="node-role">Noise Reduction</div>
+                        </div>
+                    </div>
+
+                    <div class="engine-node" id="node-hephaestus">
+                        <div class="node-ring">
+                            <img src="https://imgur.com/7QbiKPT.png" alt="Hephaestus" onerror="this.src='https://placehold.co/80x80/10b981/white?text=H'">
+                        </div>
+                        <div class="node-info">
+                            <div class="node-name">Hephaestus</div>
+                            <div class="node-role">Action & Automation</div>
+                        </div>
+                    </div>
+
+                    <!-- Insight Cards -->
+                    <div class="insight-card insight-top" id="insight-atlas" style="top: 0; left: 50%; transform: translateX(-50%);">
+                        <p>Efficiently ingests and normalizes diverse operational data, powering robust AI applications.</p>
+                    </div>
+
+                    <div class="insight-card insight-top" id="insight-merlin" style="top: -5%; left: 50%; transform: translateX(-50%);">
+                        <p>Delivers instant resolution context, linking symptoms to solutions with AI insights.</p>
+                    </div>
+
+                    <div class="insight-card insight-bottom" id="insight-argus" style="bottom: 0; left: 25%; transform: translateX(-50%);">
+                        <p>Proactively signals critical anomalies, cutting through telemetry noise for faster action.</p>
+                    </div>
+
+                    <div class="insight-card insight-bottom" id="insight-hephaestus" style="bottom: 0; right: 5%;">
+                        <p>Achieves rapid resilience by automating fixes and resolving issues at machine speed.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outcomes Panel -->
+            <div class="section-card outcomes-section">
+                <h2 class="section-title">Outcomes</h2>
+                <p class="section-subtitle">Value realized by your business</p>
+
+                <div class="outcome-carousel">
+                    <div class="outcome-track" id="outcome-track"></div>
+                </div>
+
+                <div class="outcome-badge">
+                    <i class="fas fa-chart-line"></i>
+                    Real-time analytics
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const svg = document.getElementById('svg-connections');
+            const diagram = document.getElementById('diagram');
+
+            // Get node center position
+            function getNodeCenter(id) {
+                const node = document.getElementById(id);
+                const ring = node.querySelector('.node-ring');
+                const rect = ring.getBoundingClientRect();
+                const parentRect = diagram.getBoundingClientRect();
+
+                return {
+                    x: rect.left - parentRect.left + rect.width / 2,
+                    y: rect.top - parentRect.top + rect.height / 2
+                };
+            }
+
+            // Draw connections
+            function drawConnections() {
+                const isMobile = window.innerWidth < 900;
+                svg.innerHTML = `
+                    <defs>
+                        <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#0ea5e9" />
+                            <stop offset="100%" stop-color="#6366f1" />
+                        </linearGradient>
+                    </defs>
+                `;
+
+                const atlas = getNodeCenter('node-atlas');
+                const merlin = getNodeCenter('node-merlin');
+                const argus = getNodeCenter('node-argus');
+                const hephaestus = getNodeCenter('node-hephaestus');
+
+                const connections = isMobile ? [
+                    { from: atlas, to: merlin },
+                    { from: merlin, to: argus },
+                    { from: argus, to: hephaestus }
+                ] : [
+                    { from: atlas, to: merlin },
+                    { from: atlas, to: argus },
+                    { from: merlin, to: hephaestus },
+                    { from: argus, to: hephaestus }
+                ];
+
+                connections.forEach(conn => {
+                    // Background path
+                    const bgPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    bgPath.setAttribute('class', 'connection-path-bg');
+
+                    // Main path
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('class', 'connection-path connection-animated');
+
+                    // Create curved path
+                    const midX = (conn.from.x + conn.to.x) / 2;
+                    const midY = (conn.from.y + conn.to.y) / 2;
+                    const curveOffset = isMobile ? 30 : 50;
+                    const offsetX = conn.from.x < conn.to.x ? -curveOffset : curveOffset;
+
+                    const d = `M ${conn.from.x} ${conn.from.y} Q ${midX + offsetX} ${midY} ${conn.to.x} ${conn.to.y}`;
+
+                    bgPath.setAttribute('d', d);
+                    path.setAttribute('d', d);
+
+                    svg.appendChild(bgPath);
+                    svg.appendChild(path);
+                });
+            }
+
+            // Initial draw after DOM settles
+            setTimeout(drawConnections, 100);
+
+            // Redraw on resize
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(drawConnections, 100);
+            });
+
+            // Insight card cycling
+            const insightCards = {
+                'node-atlas': 'insight-atlas',
+                'node-merlin': 'insight-merlin',
+                'node-argus': 'insight-argus',
+                'node-hephaestus': 'insight-hephaestus'
+            };
+
+            const nodeIds = Object.keys(insightCards);
+            let currentInsightIndex = 0;
+            let insightInterval;
+
+            function showInsight(index) {
+                Object.values(insightCards).forEach(id => {
+                    document.getElementById(id).classList.remove('visible');
+                });
+
+                const cardId = insightCards[nodeIds[index]];
+                document.getElementById(cardId).classList.add('visible');
+            }
+
+            function cycleInsights() {
+                if (window.innerWidth < 900) return;
+                showInsight(currentInsightIndex);
+                currentInsightIndex = (currentInsightIndex + 1) % nodeIds.length;
+            }
+
+            // Hover interactions
+            nodeIds.forEach((nodeId, index) => {
+                const node = document.getElementById(nodeId);
+                node.addEventListener('mouseenter', () => {
+                    clearInterval(insightInterval);
+                    showInsight(index);
+                });
+                node.addEventListener('mouseleave', () => {
+                    insightInterval = setInterval(cycleInsights, 3500);
+                });
+            });
+
+            // Start cycling
+            if (window.innerWidth >= 900) {
+                insightInterval = setInterval(cycleInsights, 3500);
+                cycleInsights();
+            }
+
+            // Outcome Carousel
+            const outcomes = [
+                "Faster Incident Resolution",
+                "Enhanced Operational Efficiency",
+                "Improved System Reliability",
+                "Reduced Operational Costs",
+                "Context-aware Correlation",
+                "Real-time On-call Guidance",
+                "Predictive Log Analytics",
+                "Anomaly Detection",
+                "Root Cause Analysis"
+            ];
+
+            const track = document.getElementById('outcome-track');
+            const tripled = [...outcomes, ...outcomes, ...outcomes];
+
+            tripled.forEach(text => {
+                const item = document.createElement('div');
+                item.className = 'outcome-item';
+                item.textContent = text;
+                track.appendChild(item);
+            });
+
+            let outcomeIndex = outcomes.length;
+            const items = track.querySelectorAll('.outcome-item');
+            const itemHeight = 44;
+
+            function updateOutcomes() {
+                track.style.transition = 'transform 0.5s ease';
+                track.style.transform = `translateY(-${outcomeIndex * itemHeight}px)`;
+
+                items.forEach((item, i) => {
+                    item.classList.toggle('active', i === outcomeIndex + 1);
+                });
+            }
+
+            function advanceOutcome() {
+                outcomeIndex++;
+                updateOutcomes();
+
+                if (outcomeIndex >= outcomes.length * 2) {
+                    setTimeout(() => {
+                        track.style.transition = 'none';
+                        outcomeIndex = outcomes.length;
+                        track.style.transform = `translateY(-${outcomeIndex * itemHeight}px)`;
+                    }, 500);
+                }
+            }
+
+            updateOutcomes();
+            setInterval(advanceOutcome, 3000);
+        });
+    </script>
+</body>
+</html>

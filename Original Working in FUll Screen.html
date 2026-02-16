@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIOps Flow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* --- 1. General Styles --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb; /* White Background (Gray-50) */
+            color: #1f2937; /* Dark text (Gray-800) */
+            overflow-x: hidden;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* --- 2. Layout Styles --- */
+        .main-container {
+            width: 100%;
+            max-width: 80rem;
+            margin-left: auto;
+            margin-right: auto;
+            padding-top: 0rem; /* Moved higher to top of viewport */
+        }
+
+        .sources-section, .outcomes-section {
+             position: relative; 
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             padding: 1rem;
+             border-radius: 1rem;
+        }
+
+        /* Matches Node Labels style */
+        .section-header {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #000000; /* Dark black */
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.25rem;
+            text-align: center;
+        }
+
+        /* Matches Node Descriptions style - Updated to dark black */
+        .section-subheader {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: #000000; /* Dark black */
+            margin-bottom: 3.5rem; 
+            text-align: center;
+            max-width: 250px;
+            line-height: 1.3;
+        }
+
+        /* --- 3. Diagram Component Styles --- */
+        @keyframes moveDotsLeftToRight {0% { background-position: 0 center; } 100% { background-position: 30px center; }}
+        @keyframes moveDotsTopToBottom {0% { background-position: center 0; } 100% { background-position: center 30px; }}
+        @keyframes moveDotsBottomToTop {0% { background-position: center 30px; } 100% { background-position: center 0; }}
+        
+        @keyframes pulseNodeGlow {
+            0%, 100% { box-shadow: 0 0 15px 2px rgba(45, 212, 191, 0.3); } 
+            50% { box-shadow: 0 0 30px 8px rgba(45, 212, 191, 0.5); }
+        }
+        
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); }}
+
+        /* Line color Teal/Cyan (#2dd4bf) */
+        .line { position: absolute; transform-origin: 0 0; z-index: 0; background-color: #2dd4bf; overflow: hidden; border-radius: 3px; }
+        .line::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(circle, #ffffff 1.5px, transparent 2px); background-repeat: repeat; background-size: 30px 30px; animation: moveDotsLeftToRight 1s linear infinite; opacity: 0.9; }
+        .line-horizontal { height: 4px; }
+        .line-horizontal::after { background-size: 30px 4px; animation-name: moveDotsLeftToRight; }
+        .line-vertical { width: 4px; }
+        .line-vertical::after { background-size: 4px 30px; animation-name: moveDotsTopToBottom; animation-duration: 1s; animation-timing-function: linear; animation-iteration-count: infinite; }
+        .line-vertical.flow-up::after { animation-name: moveDotsBottomToTop; }
+        .line-vertical.flow-down::after { animation-name: moveDotsTopToBottom; }
+
+        .node-container { position: absolute; z-index: 1; display: flex; flex-direction: column; align-items: center; width: 90px; }
+        .node-image { width: 80px; height: 80px; object-fit: cover; display: block; transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out; margin-bottom: 4px; border-radius: 50%; animation: pulseNodeGlow 3s infinite ease-in-out; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); padding: 2px; }
+        .node-label { font-size: 0.8rem; font-weight: 600; color: #000000; text-align: center; margin-top: 2px; }
+        .node-description { font-size: 0.65rem; font-weight: 400; color: #000000; text-align: center; margin-top: 1px; line-height: 1.2; }
+
+        /* --- FLOW Popup Styles --- */
+        .flow-popup {
+            display: none; 
+            position: absolute;
+            bottom: calc(100% + 15px); 
+            left: 50%;
+            width: 250px; 
+            background-image: linear-gradient(to bottom, #ffffff, #f3f4f6); 
+            color: #1e40af; /* Brightened to a vibrant professional blue */
+            padding: 12px;
+            border-radius: 0.75rem; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
+            font-size: 0.875rem;
+            line-height: 1.4; 
+            z-index: 50; 
+            text-align: left;
+            font-weight: 500; /* Added slight weight to help the color pop */
+            border: 1px solid #e5e7eb;
+            transition: box-shadow 0.5s ease-in-out;
+        }
+        .flow-popup::after { 
+            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+            border-width: 5px; border-style: solid; 
+            border-color: #f3f4f6 transparent transparent transparent;
+        }
+        .flow-popup.popup-bottom { bottom: auto; top: calc(100% + 15px); }
+        .flow-popup.popup-bottom::after { 
+            top: auto; bottom: 100%; 
+            border-color: transparent transparent #ffffff transparent;
+        }
+
+        @keyframes fadeInFlowPopup { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0px); }}
+        @keyframes fadeOutFlowPopup { from { opacity: 1; transform: translate(-50%, 0px); } to { opacity: 0; transform: translate(-50%, -10px); }}
+
+        .flow-popup.flow-popup-active {
+          display: block !important; 
+          opacity: 0; 
+          transform: translate(-50%, 10px); 
+          animation: fadeInFlowPopup 5.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+          box-shadow: 0 0 20px 5px rgba(45, 212, 191, 0.2), 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+        }
+        .flow-popup.flow-popup-hiding {
+          opacity: 1; 
+          transform: translate(-50%, 0px); 
+          animation: fadeOutFlowPopup 5.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Logo Cloud Styles --- */
+        #logo-cloud-wrapper .logo-container { position: relative; width: 22vw; height: 35vh; max-width: 800px; max-height: 500px; margin: 0 auto; }
+        #logo-cloud-wrapper .logo-card { position: absolute; background-color: #ffffff; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05); display: flex; justify-content: center; align-items: center; width: 4rem; height: 4rem; z-index: 1; transition: transform 0.2s ease-in-out; animation: float 6s ease-in-out infinite; border: 1px solid #f3f4f6; }
+        
+        #logo-cloud-wrapper #splunk { top: 5%; left: 10%; animation-delay: 0s; } 
+        #logo-cloud-wrapper #aws-cloudwatch { top: 35%; left: 5%; animation-delay: -1s; } 
+        #logo-cloud-wrapper #azure { top: 65%; left: 15%; animation-delay: -2s; } 
+        #logo-cloud-wrapper #databricks { top: 5%; left: 55%; animation-delay: -3s; } 
+        #logo-cloud-wrapper #confluence { top: 20%; left: 80%; animation-delay: -4s; } 
+        #logo-cloud-wrapper #google-drive { top: 50%; left: 45%; animation-delay: -0.5s; } 
+        #logo-cloud-wrapper #elasticsearch { top: -10%; left: 90%; animation-delay: -1.5s; } 
+        #logo-cloud-wrapper #slack { top: 70%; left: 75%; animation-delay: -2.5s; }
+        #logo-cloud-wrapper #jira { top: 85%; left: 45%; animation-delay: -2s; }
+        #logo-cloud-wrapper #snowflake { top: 20%; left: 35%; animation-delay: -1.5s; }
+
+        .logo-icon { font-size: 1.75rem; color: #4b5563; }
+        .fa-database { color: #00BFB3; } 
+        .fa-slack { color: #4A154B; } 
+        .fa-google-drive { color: #34A853; } 
+        .fa-snowflake { color: #29B5E8; } /* Snowflake Blue */
+        .fa-jira { color: #0052CC; } 
+        .fa-cloud { color: #0078D4; } 
+        .fa-server { color: #ED1B24; } 
+        .fa-aws { color: #FF9900; } 
+        .fa-cubes { color: #FF3621; }
+
+        #logo-cloud-wrapper .fade-overlay { position: absolute; top: 0; left: 0; width: 70%; height: 100%; background: linear-gradient(to right, #f9fafb 10%, rgba(249, 250, 251, 0) 70%); pointer-events: none; z-index: 2; }
+        
+        /* --- Carousel Styles --- */
+        #carousel { overflow: hidden; height: 150px; position: relative; border-radius: 0.5rem; width: 100%; margin-top: 1rem; }
+        @media (min-width: 768px) {
+            #outcomes-section .carousel-container {
+                margin-top: 1.00rem; 
+            }
+        }
+        .carousel-list { list-style: none; padding: 0; margin: 0; width: 100%; transition: transform 0.8s ease-in-out; }
+        .carousel-list li { height: 50px; display: flex; align-items: center; justify-content: center; text-align: center; padding-left: 0.5rem; padding-right: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #6b7280; opacity: 0.7; font-size: 0.875rem; font-weight: 400; transition: color 0.5s ease, opacity 0.5s ease, font-weight 0.5s ease, font-size 0.5s ease; }
+        .carousel-list li.highlighted { color: #111827; font-weight: 600; opacity: 1; font-size: 1rem; }
+
+        /* --- Responsive Styles --- */
+        @media (max-width: 767.98px) {
+            .main-container { flex-direction: column; align-items: center; padding-top: 1rem; }
+            .sources-section, .outcomes-section { width: 90%; margin-bottom: 2rem; }
+            .sources-section { order: 1; } .outcomes-section { order: 2; }
+            .diagram-section { width: 100%; height: auto; padding: 1rem 0; min-height: auto; order: 3; }
+            #logo-cloud-wrapper .logo-container { width: 90vw; height: 45vh; margin: 1rem auto; }
+            .diagram-content { height: auto; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+            .node-container { position: relative; top: auto !important; left: auto !important; margin: 0; display: flex; flex-direction: column; align-items: center; width: 100%; }
+            .line { display: none; }
+            .flow-popup { display: none !important; }
+            #logo-cloud-wrapper .fade-overlay { background: linear-gradient(to right, #f9fafb 10%, rgba(249, 250, 251, 0) 50%); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container flex flex-col md:flex-row md:justify-center items-start md:items-start gap-8 min-h-[60vh] w-full">
+
+        <!-- Sources Section with Static Labels -->
+        <div id="sources-section" class="sources-section w-full md:w-1/3 order-1 p-0 md:p-4 rounded-lg">
+            <h3 class="section-header">Sources</h3>
+            <p class="section-subheader">Harmonizing with Your Essential Applications</p>
+            
+            <div id="logo-cloud-wrapper" class="w-full">
+                <div class="logo-container">
+                    <div class="fade-overlay"></div>
+                    <div id="splunk" class="logo-card"><i class="fas fa-server logo-icon"></i></div>
+                    <div id="aws-cloudwatch" class="logo-card"><i class="fab fa-aws logo-icon"></i></div> 
+                    <div id="azure" class="logo-card"><i class="fas fa-cloud logo-icon"></i></div>
+                    <div id="databricks" class="logo-card"><i class="fas fa-cubes logo-icon"></i></div>
+                    <div id="confluence" class="logo-card"><i class="fab fa-confluence logo-icon"></i></div>
+                    <div id="google-drive" class="logo-card"><i class="fab fa-google-drive logo-icon"></i></div>
+                    <div id="elasticsearch" class="logo-card"><i class="fas fa-database logo-icon"></i></div> 
+                    <div id="slack" class="logo-card"><i class="fab fa-slack logo-icon"></i></div>
+                    <div id="jira" class="logo-card"><i class="fab fa-jira logo-icon"></i></div>
+                    <div id="snowflake" class="logo-card"><i class="fas fa-snowflake logo-icon"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagram Section (Middle Engine) - Moved down via md:mt-16 to align with side content -->
+        <div class="diagram-section w-full md:w-1/3 order-3 md:order-2 flex justify-center items-center relative min-h-[400px] md:min-h-[300px] md:mt-16">
+            <div class="diagram-content relative w-full h-full">
+                <div class="line line-horizontal" style="top: 50%; left: 0%; width: calc(50% - 90px);"></div>
+                <div class="line line-horizontal" style="top: 50%; left: calc(0% + 120px); width: calc(150% - (50% + 40px));"></div>
+                <div class="line line-vertical flow-up" style="left: calc(75% - 10px); top: calc(50% - 40px); height: 40px;"></div>
+                <div class="line line-vertical flow-down" style="left: calc(90% - 90px); top: 50%; height: 70px;"></div>
+                <div class="line line-vertical flow-down" style="left: calc(75% + 90px); top: 50%; height: 70px;"></div>
+
+                <div id="atlas-node-container" class="node-container" style="top: calc(50% - 40px); left: calc(30% - 40px);">
+                    <img class="node-image" src="https://imgur.com/0ya7Fj7.png" onerror="this.onerror=null; this.src='https://placehold.co/80x80/60a5fa/FFFFFF?text=Atlas';" alt="Atlas Icon">
+                    <div class="node-label">Atlas</div> 
+                    <div class="node-description">Data Integration & Enrichment</div>
+                </div>
+                <div id="merlin-node-container" class="node-container" style="top: calc(50% - 160px); left: calc(75% - 45px);">
+                    <img class="node-image" src="https://imgur.com/QyrDXOG.png" onerror="this.onerror=null; this.src='https://placehold.co/80x80/88a0f2/FFFFFF?text=Merlin';" alt="Merlin Icon">
+                    <div class="node-label">Merlin</div> 
+                    <div class="node-description">Correlation & Insights</div>
+                </div>
+                <div id="argus-node-container" class="node-container" style="top: calc(50% + 70px); left: calc(85% - 130px);">
+                    <img class="node-image" src="https://imgur.com/xMcN4Yw.png" onerror="this.onerror=null; this.src='https://placehold.co/80x80/f2d088/FFFFFF?text=Argus';" alt="Argus Icon">
+                    <div class="node-label">Argus</div> 
+                    <div class="node-description">Noise Reduction & RCA</div>
+                </div>
+                <div id="hephaestus-node-container" class="node-container" style="top: calc(50% + 70px); left: calc(75% + 50px);">
+                    <img class="node-image" src="https://imgur.com/7QbiKPT.png" onerror="this.onerror=null; this.src='https://placehold.co/80x80/f2a088/FFFFFF?text=Hephaestus';" alt="Hephaestus Icon">
+                    <div class="node-label">Hephaestus</div> 
+                    <div class="node-description">Action & automation</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Outcomes Section with Static Labels -->
+        <div id="outcomes-section" class="outcomes-section w-full md:w-1/3 order-2 md:order-3 p-0 md:p-4 rounded-lg md:ml-3">
+            <h3 class="section-header">Outcomes</h3>
+            <p class="section-subheader">Value Realized by Business</p>
+
+             <div class="carousel-container relative w-full">
+                <div id="carousel" class="relative">
+                    <ul class="carousel-list"></ul>
+                </div>
+             </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const flowStepsConfig = [
+                { anchorId: 'atlas-node-container', flowPopupId: 'flow-popup-atlas', content: 'Efficiently ingests and normalizes diverse operational data, powering robust AI applications.' },
+                { anchorId: 'merlin-node-container', flowPopupId: 'flow-popup-merlin', content: 'Delivers instant resolution context, linking symptoms to solutions with AI insights.' },
+                { anchorId: 'argus-node-container', flowPopupId: 'flow-popup-argus', content: 'Proactively signals critical anomalies, cutting through telemetry noise for faster action.' },
+                { anchorId: 'hephaestus-node-container', flowPopupId: 'flow-popup-hephaestus', content: 'Achieves rapid resilience by automating fixes and resolving issues at machine speed.' }
+            ];
+
+            const DISPLAY_DURATION = 5000; 
+            const ANIMATION_DURATION_JS = 5200; 
+            const DELAY_BETWEEN_POPUPS = 200;
+
+            let currentFlowStepIndex = 0;
+            const flowPopupElements = []; 
+            let activeFlowTimeout = null; 
+            let resizeDebounceTimeout; 
+
+            // Initialize Flow Popups
+            for (let i = 0; i < flowStepsConfig.length; i++) {
+                const config = flowStepsConfig[i];
+                const anchorElement = document.getElementById(config.anchorId);
+                if (!anchorElement) continue;
+
+                let flowPopup = document.createElement('div');
+                flowPopup.classList.add('flow-popup');
+                flowPopup.id = config.flowPopupId;
+                const p = document.createElement('p');
+                p.textContent = config.content;
+                flowPopup.appendChild(p);
+                anchorElement.appendChild(flowPopup);
+                flowPopupElements.push(flowPopup); 
+            }
+            
+            function executeAutomatedFlowStep() {
+                clearTimeout(activeFlowTimeout); 
+
+                if (window.innerWidth < 768 || flowPopupElements.length === 0) return;
+
+                flowPopupElements.forEach((fp, index) => {
+                    if (fp && index !== currentFlowStepIndex) {
+                        fp.style.display = 'none'; 
+                        fp.classList.remove('flow-popup-active', 'flow-popup-hiding');
+                    }
+                });
+                
+                const currentFlowPopup = flowPopupElements[currentFlowStepIndex]; 
+                const currentAnchorElement = document.getElementById(flowStepsConfig[currentFlowStepIndex].anchorId); 
+
+                if (!currentFlowPopup || !currentAnchorElement) { 
+                    currentFlowStepIndex = (currentFlowStepIndex + 1) % flowStepsConfig.length;
+                    activeFlowTimeout = setTimeout(executeAutomatedFlowStep, DELAY_BETWEEN_POPUPS);
+                    return;
+                }
+
+                currentFlowPopup.classList.remove('popup-bottom'); 
+                let refElement = currentAnchorElement;
+                if (currentAnchorElement.classList.contains('node-container')) {
+                    refElement = currentAnchorElement.querySelector('.node-image') || currentAnchorElement;
+                }
+                
+                const anchorRect = refElement.getBoundingClientRect();
+                let popupHeight = currentFlowPopup.offsetHeight || 100;
+
+                const forcedAbove = [0, 1];
+                const forcedBelow = [2, 3];
+                
+                if (forcedBelow.includes(currentFlowStepIndex)) {
+                    currentFlowPopup.classList.add('popup-bottom');
+                } else if (!forcedAbove.includes(currentFlowStepIndex) && anchorRect.top < popupHeight + 20) {
+                    currentFlowPopup.classList.add('popup-bottom');
+                }
+                
+                currentFlowPopup.style.display = 'block'; 
+                currentFlowPopup.classList.add('flow-popup-active');
+
+                activeFlowTimeout = setTimeout(() => {
+                    currentFlowPopup.classList.remove('flow-popup-active'); 
+                    currentFlowPopup.classList.add('flow-popup-hiding');
+                    
+                    setTimeout(() => {
+                        currentFlowPopup.style.display = 'none';
+                        currentFlowPopup.classList.remove('flow-popup-hiding');
+                    }, ANIMATION_DURATION_JS);
+
+                    currentFlowStepIndex = (currentFlowStepIndex + 1) % flowStepsConfig.length;
+                    activeFlowTimeout = setTimeout(executeAutomatedFlowStep, DELAY_BETWEEN_POPUPS);
+                }, DISPLAY_DURATION);
+            }
+            
+            if (flowPopupElements.length > 0) executeAutomatedFlowStep();
+
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeDebounceTimeout);
+                resizeDebounceTimeout = setTimeout(() => {
+                    clearTimeout(activeFlowTimeout);
+                    flowPopupElements.forEach(fp => {
+                        fp.style.display = 'none';
+                        fp.classList.remove('flow-popup-active', 'flow-popup-hiding');
+                    });
+                    currentFlowStepIndex = 0;
+                    if (window.innerWidth >= 768) executeAutomatedFlowStep();
+                }, 250);
+            });
+
+            // Carousel Logic
+            const phrases = ["Faster Incident Resolution", "Enhanced Operational Efficiency", "Improved System Reliability", "Reduced Operational Costs", "Context-aware incident correlation", "Real-time on-call guidance", "Predictive log analytics", "Anomaly detection", "Root cause analysis"];
+            const list = document.querySelector('.carousel-list');
+            if (list) {
+                const allPhrases = [...phrases, ...phrases, ...phrases];
+                allPhrases.forEach(phrase => {
+                    const li = document.createElement('li');
+                    li.textContent = phrase;
+                    list.appendChild(li);
+                });
+                const allItems = list.querySelectorAll('li');
+                let idx = phrases.length;
+                const updateHighlight = () => {
+                    allItems.forEach((item, i) => item.classList.toggle('highlighted', i % phrases.length === (idx + 1) % phrases.length));
+                };
+
+                const carouselInterval = setInterval(() => {
+                    idx++;
+                    list.style.transition = 'transform 800ms ease-in-out';
+                    list.style.transform = `translateY(-${idx * 50}px)`;
+                    updateHighlight();
+                    if (idx >= phrases.length * 2) {
+                        setTimeout(() => {
+                            list.style.transition = 'none';
+                            idx %= phrases.length;
+                            idx += phrases.length;
+                            list.style.transform = `translateY(-${idx * 50}px)`;
+                        }, 800);
+                    }
+                }, 3500);
+                
+                list.style.transform = `translateY(-${idx * 50}px)`;
+                updateHighlight();
+            }
+        });
+    </script>
+</body>
+</html>
