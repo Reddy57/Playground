@@ -312,66 +312,8 @@
             display: none;
         }
 
-        @media (min-width: 1024px) {
-            .flow-entry,
-            .flow-exit {
-                display: block;
-            }
-
-            .flow-entry {
-                top: 54%;
-                left: calc(-4vw - 20px);
-                width: calc(4vw + 20px);
-                transform: translateY(-50%);
-            }
-
-            .flow-exit {
-                top: 54%;
-                right: calc(-4vw - 20px);
-                width: calc(4vw + 20px);
-                transform: translateY(-50%);
-            }
-
-            /* Arrow heads */
-            .flow-entry::before {
-                content: '';
-                position: absolute;
-                right: -10px;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 0;
-                height: 0;
-                border-top: 8px solid transparent;
-                border-bottom: 8px solid transparent;
-                border-left: 12px solid var(--flow-color);
-            }
-
-            .flow-exit::before {
-                content: '';
-                position: absolute;
-                right: -10px;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 0;
-                height: 0;
-                border-top: 8px solid transparent;
-                border-bottom: 8px solid transparent;
-                border-left: 12px solid var(--flow-color);
-            }
-
-            .flow-entry::after,
-            .flow-exit::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-image: radial-gradient(circle, #fff 1.5px, transparent 2px);
-                background-size: 12px 4px;
-                animation: flowDash 0.6s linear infinite;
-            }
-        }
+        /* Flow entry/exit - hidden, using SVG arrows instead */
+        .flow-entry, .flow-exit { display: none !important; }
 
         /* ============================================
            ENGINE NODES
@@ -896,6 +838,12 @@
                     const trunkY = atlas.y; // Main horizontal trunk line
 
                     connections = [
+                        // Entry: left edge to Atlas
+                        {
+                            from: { x: 20, y: trunkY },
+                            to: { x: atlas.x - 50, y: trunkY },
+                            type: 'entry'
+                        },
                         // Main trunk: Atlas to right edge
                         {
                             from: atlas,
@@ -923,6 +871,22 @@
                     ];
                 }
 
+                // Add arrow marker definition
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '10');
+                marker.setAttribute('markerHeight', '7');
+                marker.setAttribute('refX', '9');
+                marker.setAttribute('refY', '3.5');
+                marker.setAttribute('orient', 'auto');
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 10 3.5, 0 7');
+                polygon.setAttribute('fill', '#2dd4bf');
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
                 // Draw each connection
                 connections.forEach(conn => {
                     let d;
@@ -946,10 +910,13 @@
                     glow.setAttribute('d', d);
                     svg.appendChild(glow);
 
-                    // Main animated line
+                    // Main animated line with arrow on trunk
                     const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                     line.setAttribute('class', 'flow-line flow-animated');
                     line.setAttribute('d', d);
+                    if (conn.type === 'trunk' || conn.type === 'entry') {
+                        line.setAttribute('marker-end', 'url(#arrowhead)');
+                    }
                     svg.appendChild(line);
                 });
             }
