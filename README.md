@@ -6,14 +6,26 @@ Interactive visualization of the AIOps data pipeline, showing how data flows fro
 
 ## 🚀 Live Demos
 
+### Dark Themes
+
 | Version | Description | View |
 |---------|-------------|------|
 | **Final** ⭐ | Definitive version - CSS flow lines, colored icons, original layout | [View Demo](https://reddy57.github.io/Playground/AIOps-Final.html) |
 | **Mission Control** | Premium "NASA control room" aesthetic | [View Demo](https://reddy57.github.io/Playground/AIOps-Mission-Control.html) |
 | **Complete Flow** | Clean dark theme with full pipeline visualization | [View Demo](https://reddy57.github.io/Playground/AIOps-Complete-Flow.html) |
 | **Glass Modern** | Vibrant glassmorphism with animated gradient orbs | [View Demo](https://reddy57.github.io/Playground/AIOps-Glass-Modern.html) |
-| **Premium Light** | Light corporate theme for presentations | [View Demo](https://reddy57.github.io/Playground/AIOps-Premium-Light.html) |
 | **Responsive Fixed** | Dark technical theme (first iteration) | [View Demo](https://reddy57.github.io/Playground/AIOps-Responsive-Fixed.html) |
+
+### Light Themes
+
+| Version | Description | View |
+|---------|-------------|------|
+| **Final Light** | Light version of the definitive design | [View Demo](https://reddy57.github.io/Playground/AIOps-Final-Light.html) |
+| **Mission Control Light** | Light "control room" aesthetic | [View Demo](https://reddy57.github.io/Playground/AIOps-Mission-Control-Light.html) |
+| **Complete Flow Light** | Clean light theme with SVG arrows | [View Demo](https://reddy57.github.io/Playground/AIOps-Complete-Flow-Light.html) |
+| **Glass Modern Light** | Light glassmorphism with soft gradients | [View Demo](https://reddy57.github.io/Playground/AIOps-Glass-Modern-Light.html) |
+| **Premium Light** | Light corporate theme for presentations | [View Demo](https://reddy57.github.io/Playground/AIOps-Premium-Light.html) |
+| **Responsive Fixed Light** | Light technical theme | [View Demo](https://reddy57.github.io/Playground/AIOps-Responsive-Fixed-Light.html) |
 
 ---
 
@@ -35,7 +47,7 @@ Interactive visualization of the AIOps data pipeline, showing how data flows fro
 - **Original Pipeline Layout** — Atlas on left, Merlin branches up, Argus/Hephaestus branch down
 - **Animated Flow Lines** — SVG-based lines with flowing dot animation
 - **Auto-cycling Tooltips** — Insights rotate automatically, with hover interaction
-- **10 Source Integrations** — Splunk, AWS, Azure, Databricks, Confluence, Google Drive, Elasticsearch, Slack, Jira, Snowflake
+- **12 Source Integrations** — Splunk, AWS, Azure, Databricks, Confluence, Google Drive, Elasticsearch, Slack, Jira, Snowflake, GitHub, PagerDuty
 
 ---
 
@@ -72,13 +84,27 @@ Interactive visualization of the AIOps data pipeline, showing how data flows fro
 
 ## 📂 Files
 
+### Dark Themes
 ```
 ├── AIOps-Final.html              ⭐ RECOMMENDED - All fixes applied
 ├── AIOps-Mission-Control.html
 ├── AIOps-Complete-Flow.html
 ├── AIOps-Glass-Modern.html
+└── AIOps-Responsive-Fixed.html
+```
+
+### Light Themes
+```
+├── AIOps-Final-Light.html
+├── AIOps-Mission-Control-Light.html
+├── AIOps-Complete-Flow-Light.html
+├── AIOps-Glass-Modern-Light.html
 ├── AIOps-Premium-Light.html
-├── AIOps-Responsive-Fixed.html
+└── AIOps-Responsive-Fixed-Light.html
+```
+
+### Reference Files
+```
 ├── Original Working in FUll Screen.html  (Original reference)
 └── AIOpsNotWorkingFullScreen.html        (Original with issues)
 ```
