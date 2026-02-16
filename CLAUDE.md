@@ -68,15 +68,15 @@ Published at: https://reddy57.github.io/Playground/
 
 ---
 
-## TODO: Apply Same Fixes to Other Files
+## Completed Fixes (All Files)
 
-Files to update (in order):
+Files updated:
 1. [x] AIOps-Final.html - DONE
-2. [ ] AIOps-Mission-Control.html
-3. [ ] AIOps-Complete-Flow.html
-4. [ ] AIOps-Glass-Modern.html
-5. [ ] AIOps-Premium-Light.html
-6. [ ] AIOps-Responsive-Fixed.html
+2. [x] AIOps-Mission-Control.html - DONE
+3. [x] AIOps-Complete-Flow.html - DONE
+4. [x] AIOps-Glass-Modern.html - DONE
+5. [x] AIOps-Premium-Light.html - DONE
+6. [x] AIOps-Responsive-Fixed.html - DONE (uses SVG lines, no CSS arrows)
 
 ### Fixes to Apply to Each File:
 1. Flow entry/exit lines - shorten to `calc(-4vw - 20px)` width
