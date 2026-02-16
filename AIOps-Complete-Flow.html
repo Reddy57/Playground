@@ -838,15 +838,9 @@
                     const trunkY = atlas.y; // Main horizontal trunk line
 
                     connections = [
-                        // Entry: left edge to Atlas
+                        // Full trunk line: left edge through Atlas to right edge (continuous)
                         {
                             from: { x: 20, y: trunkY },
-                            to: { x: atlas.x - 50, y: trunkY },
-                            type: 'entry'
-                        },
-                        // Main trunk: Atlas to right edge
-                        {
-                            from: atlas,
                             to: { x: canvas.offsetWidth - 20, y: trunkY },
                             type: 'trunk'
                         },
@@ -871,20 +865,23 @@
                     ];
                 }
 
-                // Add arrow marker definition
+                // Add arrow marker definitions
                 const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
-                marker.setAttribute('id', 'arrowhead');
-                marker.setAttribute('markerWidth', '10');
-                marker.setAttribute('markerHeight', '7');
-                marker.setAttribute('refX', '9');
-                marker.setAttribute('refY', '3.5');
-                marker.setAttribute('orient', 'auto');
-                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-                polygon.setAttribute('points', '0 0, 10 3.5, 0 7');
-                polygon.setAttribute('fill', '#2dd4bf');
-                marker.appendChild(polygon);
-                defs.appendChild(marker);
+
+                // End arrow (pointing right)
+                const markerEnd = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                markerEnd.setAttribute('id', 'arrowhead-end');
+                markerEnd.setAttribute('markerWidth', '10');
+                markerEnd.setAttribute('markerHeight', '7');
+                markerEnd.setAttribute('refX', '9');
+                markerEnd.setAttribute('refY', '3.5');
+                markerEnd.setAttribute('orient', 'auto');
+                const polygonEnd = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygonEnd.setAttribute('points', '0 0, 10 3.5, 0 7');
+                polygonEnd.setAttribute('fill', '#2dd4bf');
+                markerEnd.appendChild(polygonEnd);
+                defs.appendChild(markerEnd);
+
                 svg.appendChild(defs);
 
                 // Draw each connection
@@ -914,8 +911,8 @@
                     const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                     line.setAttribute('class', 'flow-line flow-animated');
                     line.setAttribute('d', d);
-                    if (conn.type === 'trunk' || conn.type === 'entry') {
-                        line.setAttribute('marker-end', 'url(#arrowhead)');
+                    if (conn.type === 'trunk') {
+                        line.setAttribute('marker-end', 'url(#arrowhead-end)');
                     }
                     svg.appendChild(line);
                 });
