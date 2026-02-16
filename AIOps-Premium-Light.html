@@ -198,6 +198,8 @@
         .integration-chip:nth-child(8) i { color: #E01E5A; }
         .integration-chip:nth-child(9) i { color: #0052CC; }
         .integration-chip:nth-child(10) i { color: #29B5E8; }
+        .integration-chip:nth-child(11) i { color: #333333; } /* GitHub */
+        .integration-chip:nth-child(12) i { color: #06AC38; } /* PagerDuty */
 
         .integration-count {
             margin-top: clamp(12px, 2vw, 20px);
@@ -292,8 +294,8 @@
                 background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
                 z-index: 1;
             }
-            .flow-entry { top: 50%; left: -50px; width: 50px; transform: translateY(-50%); }
-            .flow-exit { top: 50%; right: -50px; width: 50px; transform: translateY(-50%); }
+            .flow-entry { top: 50%; left: calc(-4vw - 20px); width: calc(4vw + 20px); transform: translateY(-50%); }
+            .flow-exit { top: 50%; right: calc(-4vw - 20px); width: calc(4vw + 20px); transform: translateY(-50%); }
             .flow-entry::after, .flow-exit::after {
                 content: '';
                 position: absolute;
@@ -301,6 +303,31 @@
                 background-image: radial-gradient(circle, rgba(255,255,255,0.9) 1.5px, transparent 2px);
                 background-size: 20px 4px;
                 animation: flowRight 0.6s linear infinite;
+            }
+            /* Arrow heads */
+            .flow-entry::before {
+                content: '';
+                position: absolute;
+                right: -10px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 0;
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent;
+                border-left: 12px solid var(--accent-secondary);
+            }
+            .flow-exit::before {
+                content: '';
+                position: absolute;
+                right: -10px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 0;
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent;
+                border-left: 12px solid var(--accent-secondary);
             }
         }
 
@@ -347,6 +374,12 @@
 
         .node-info { margin-top: 10px; text-align: center; }
 
+        /* Merlin label above icon */
+        @media (min-width: 900px) {
+            #node-merlin { flex-direction: column-reverse; }
+            #node-merlin .node-info { margin-top: 0; margin-bottom: 10px; }
+        }
+
         .node-name {
             font-family: 'Space Grotesk', sans-serif;
             font-size: clamp(13px, 1.4vw, 16px);
@@ -375,7 +408,7 @@
 
         /* Node Positions - Desktop */
         @media (min-width: 900px) {
-            #node-atlas { top: 50%; left: 10%; }
+            #node-atlas { top: 54%; left: 10%; }
             #node-merlin { top: 18%; left: 50%; }
             #node-argus { top: 82%; left: 40%; }
             #node-hephaestus { top: 82%; left: 72%; }
@@ -524,11 +557,13 @@
                     <div class="integration-chip"><i class="fab fa-slack"></i></div>
                     <div class="integration-chip"><i class="fab fa-jira"></i></div>
                     <div class="integration-chip"><i class="fas fa-snowflake"></i></div>
+                    <div class="integration-chip"><i class="fab fa-github"></i></div>
+                    <div class="integration-chip"><i class="fas fa-bell"></i></div>
                 </div>
 
                 <p class="integration-count">
                     <i class="fas fa-plug"></i>
-                    <strong>10</strong> active integrations
+                    <strong>12</strong> active integrations
                 </p>
             </div>
 
