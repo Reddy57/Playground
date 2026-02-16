@@ -3,53 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIOps Architecture Flow</title>
+    <title>AIOps Architecture Flow - Mission Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
         :root {
-            /* Mission Control Palette */
             --void: #050a14;
             --deep: #0a1628;
             --panel: #0f1f38;
             --surface: #162a4a;
             --border: rgba(56, 189, 248, 0.12);
             --border-glow: rgba(56, 189, 248, 0.25);
-
-            /* Signal Colors */
             --signal: #38bdf8;
-            --signal-bright: #7dd3fc;
             --signal-glow: rgba(56, 189, 248, 0.5);
             --signal-dim: rgba(56, 189, 248, 0.15);
-
-            /* Text Hierarchy */
             --text-bright: #f0f9ff;
             --text-primary: #bae6fd;
-            --text-secondary: #7dd3fc;
-            --text-muted: #38bdf8;
-            --text-dim: rgba(56, 189, 248, 0.5);
+            --text-muted: #64748b;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html, body {
+        body {
             font-family: 'Satoshi', -apple-system, sans-serif;
             background: var(--void);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
         }
-
-        /* ════════════════════════════════════════════
-           ATMOSPHERIC BACKGROUND
-           ════════════════════════════════════════════ */
 
         .atmosphere {
             position: fixed;
@@ -67,18 +51,11 @@
                 radial-gradient(ellipse 60% 40% at 80% 60%, rgba(56, 189, 248, 0.03) 0%, transparent 50%);
         }
 
-        /* Subtle scan line effect */
         .atmosphere::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(56, 189, 248, 0.01) 2px,
-                rgba(56, 189, 248, 0.01) 4px
-            );
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(56, 189, 248, 0.01) 2px, rgba(56, 189, 248, 0.01) 4px);
             animation: scanMove 8s linear infinite;
         }
 
@@ -87,11 +64,7 @@
             to { transform: translateY(8px); }
         }
 
-        /* ════════════════════════════════════════════
-           MAIN LAYOUT
-           ════════════════════════════════════════════ */
-
-        .command-center {
+        .main-wrapper {
             position: relative;
             z-index: 1;
             min-height: 100vh;
@@ -101,38 +74,28 @@
             justify-content: center;
         }
 
-        .mission-grid {
+        .flow-grid {
             width: 100%;
             max-width: 1500px;
             display: grid;
             grid-template-columns: 1fr;
-            gap: clamp(20px, 4vw, 32px);
+            gap: clamp(24px, 4vw, 40px);
         }
 
         @media (min-width: 1024px) {
-            .mission-grid {
-                grid-template-columns: 260px 1fr 260px;
-                align-items: stretch;
+            .flow-grid {
+                grid-template-columns: 280px 1fr 280px;
+                align-items: center;
             }
         }
 
-        @media (min-width: 1400px) {
-            .mission-grid {
-                grid-template-columns: 300px 1fr 300px;
-            }
-        }
-
-        /* ════════════════════════════════════════════
-           PANEL STYLING
-           ════════════════════════════════════════════ */
-
+        /* Panel Styling */
         .panel {
             background: linear-gradient(135deg, var(--panel) 0%, var(--deep) 100%);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 20px;
             padding: clamp(20px, 3vw, 28px);
             position: relative;
-            overflow: hidden;
         }
 
         .panel::before {
@@ -149,10 +112,10 @@
         .panel-label {
             font-family: 'IBM Plex Mono', monospace;
             font-size: 10px;
-            font-weight: 500;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.3em;
-            color: var(--text-muted);
+            letter-spacing: 0.25em;
+            color: var(--signal);
             margin-bottom: 4px;
             display: flex;
             align-items: center;
@@ -178,88 +141,59 @@
             font-weight: 700;
             color: var(--text-bright);
             margin-bottom: clamp(16px, 2vw, 24px);
-            letter-spacing: -0.02em;
         }
 
-        /* ════════════════════════════════════════════
-           SOURCES PANEL
-           ════════════════════════════════════════════ */
-
+        /* Sources Panel */
         .sources-panel { order: 1; }
 
-        @media (min-width: 1024px) {
-            .sources-panel { order: 1; }
-        }
-
-        .source-matrix {
+        .source-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
         }
 
         @media (min-width: 1024px) {
-            .source-matrix {
+            .source-grid {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 10px;
             }
         }
 
-        .source-node {
+        .source-chip {
             aspect-ratio: 1;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
+            transition: all 0.3s ease;
         }
 
-        .source-node::after {
-            content: '';
-            position: absolute;
-            inset: -1px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--signal), transparent);
-            opacity: 0;
-            z-index: -1;
-            transition: opacity 0.3s;
-        }
-
-        .source-node:hover {
+        .source-chip:hover {
             transform: translateY(-3px);
             border-color: var(--signal);
-            box-shadow: 0 8px 32px var(--signal-dim);
+            box-shadow: 0 8px 24px var(--signal-dim);
         }
 
-        .source-node:hover::after {
-            opacity: 0.15;
+        .source-chip i {
+            font-size: clamp(18px, 2.2vw, 24px);
+            transition: transform 0.3s;
         }
 
-        .source-node i {
-            font-size: clamp(16px, 2vw, 22px);
-            color: var(--text-dim);
-            transition: all 0.3s;
-        }
+        .source-chip:hover i { transform: scale(1.15); }
 
-        .source-node:hover i {
-            color: var(--text-bright);
-            transform: scale(1.1);
-        }
-
-        /* Brand colors on hover */
-        .source-node:nth-child(1):hover i { color: #ED1B24; }
-        .source-node:nth-child(2):hover i { color: #FF9900; }
-        .source-node:nth-child(3):hover i { color: #0078D4; }
-        .source-node:nth-child(4):hover i { color: #FF3621; }
-        .source-node:nth-child(5):hover i { color: #172B4D; }
-        .source-node:nth-child(6):hover i { color: #34A853; }
-        .source-node:nth-child(7):hover i { color: #00BFB3; }
-        .source-node:nth-child(8):hover i { color: #4A154B; }
-        .source-node:nth-child(9):hover i { color: #0052CC; }
-        .source-node:nth-child(10):hover i { color: #29B5E8; }
+        /* Icon colors BY DEFAULT */
+        .source-chip:nth-child(1) i { color: #ED1B24; }
+        .source-chip:nth-child(2) i { color: #FF9900; }
+        .source-chip:nth-child(3) i { color: #0078D4; }
+        .source-chip:nth-child(4) i { color: #FF3621; }
+        .source-chip:nth-child(5) i { color: #2684FF; }
+        .source-chip:nth-child(6) i { color: #34A853; }
+        .source-chip:nth-child(7) i { color: #00BFB3; }
+        .source-chip:nth-child(8) i { color: #E01E5A; }
+        .source-chip:nth-child(9) i { color: #0052CC; }
+        .source-chip:nth-child(10) i { color: #29B5E8; }
 
         .source-status {
             margin-top: 16px;
@@ -267,143 +201,129 @@
             border-top: 1px solid var(--border);
             font-family: 'IBM Plex Mono', monospace;
             font-size: 11px;
-            color: var(--text-dim);
+            color: var(--text-muted);
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .status-indicator {
+        .status-dot {
             width: 8px;
             height: 8px;
             background: #22c55e;
             border-radius: 50%;
-            box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
             animation: pulse-green 2s infinite;
         }
 
         @keyframes pulse-green {
-            0%, 100% { box-shadow: 0 0 8px rgba(34, 197, 94, 0.5); }
-            50% { box-shadow: 0 0 16px rgba(34, 197, 94, 0.8); }
+            0%, 100% { box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
+            50% { box-shadow: 0 0 16px rgba(34, 197, 94, 0.9); }
         }
 
-        /* ════════════════════════════════════════════
-           ARCHITECTURE CORE - The Engine Display
-           ════════════════════════════════════════════ */
-
-        .architecture-core {
+        /* Architecture Diagram */
+        .diagram-section {
             order: 2;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            padding: clamp(24px, 4vw, 48px) clamp(16px, 3vw, 32px);
+            padding: clamp(20px, 4vw, 40px) clamp(10px, 2vw, 20px);
         }
 
-        .engine-display {
+        .diagram-canvas {
             position: relative;
             width: 100%;
-            max-width: 700px;
-            aspect-ratio: 1.1;
+            max-width: 650px;
+            height: 420px;
         }
 
         @media (min-width: 1024px) {
-            .engine-display {
-                aspect-ratio: 1.5;
-            }
+            .diagram-canvas { height: 380px; }
         }
 
-        /* ════════════════════════════════════════════
-           FLOW LINES - SVG Layer
-           ════════════════════════════════════════════ */
+        /* Flow Lines - CSS Animated */
+        @keyframes flowDotsRight {
+            0% { background-position: 0 center; }
+            100% { background-position: 20px center; }
+        }
 
-        .flow-layer {
+        @keyframes flowDotsDown {
+            0% { background-position: center 0; }
+            100% { background-position: center 20px; }
+        }
+
+        @keyframes flowDotsUp {
+            0% { background-position: center 20px; }
+            100% { background-position: center 0; }
+        }
+
+        .flow-line {
             position: absolute;
-            inset: 0;
+            background-color: var(--signal);
+            border-radius: 3px;
             z-index: 1;
-            overflow: visible;
+            box-shadow: 0 0 12px var(--signal-dim);
         }
 
-        .flow-path {
-            fill: none;
-            stroke: var(--signal);
-            stroke-width: 2.5;
-            stroke-linecap: round;
-        }
-
-        .flow-path-glow {
-            fill: none;
-            stroke: var(--signal);
-            stroke-width: 8;
-            stroke-linecap: round;
-            opacity: 0.15;
-            filter: blur(4px);
-        }
-
-        .flow-animated {
-            stroke-dasharray: 8 6;
-            animation: flowPulse 0.7s linear infinite;
-        }
-
-        @keyframes flowPulse {
-            to { stroke-dashoffset: -14; }
-        }
-
-        /* Entry and Exit Connectors */
-        .flow-connector {
-            position: absolute;
-            top: 50%;
-            height: 3px;
-            background: var(--signal);
-            z-index: 2;
-            display: none;
-        }
-
-        .flow-connector::before {
+        .flow-line::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(90deg,
-                transparent 0%,
-                var(--signal) 20%,
-                var(--signal) 80%,
-                transparent 100%
-            );
+            background-image: radial-gradient(circle, rgba(255,255,255,0.9) 1.5px, transparent 2px);
+            background-repeat: repeat;
+            border-radius: 3px;
         }
 
-        .flow-connector::after {
-            content: '';
-            position: absolute;
-            top: -3px;
-            width: 100%;
-            height: 9px;
-            background-image: radial-gradient(circle 2px, var(--signal-bright) 100%, transparent 100%);
-            background-size: 14px 9px;
-            animation: flowPulse 0.6s linear infinite;
+        .flow-line-h { height: 4px; }
+        .flow-line-h::after {
+            background-size: 20px 4px;
+            animation: flowDotsRight 0.6s linear infinite;
         }
 
-        .connector-in {
-            left: -60px;
-            width: 60px;
-            transform: translateY(-50%);
+        .flow-line-v { width: 4px; }
+        .flow-line-v.flow-down::after {
+            background-size: 4px 20px;
+            animation: flowDotsDown 0.6s linear infinite;
+        }
+        .flow-line-v.flow-up::after {
+            background-size: 4px 20px;
+            animation: flowDotsUp 0.6s linear infinite;
         }
 
-        .connector-out {
-            right: -60px;
-            width: 60px;
-            transform: translateY(-50%);
-        }
+        .flow-entry, .flow-exit { display: none; }
 
         @media (min-width: 1024px) {
-            .flow-connector {
+            .flow-entry, .flow-exit {
                 display: block;
+                position: absolute;
+                height: 4px;
+                background: var(--signal);
+                z-index: 1;
+            }
+            .flow-entry {
+                top: 50%;
+                left: -50px;
+                width: 50px;
+                transform: translateY(-50%);
+            }
+            .flow-exit {
+                top: 50%;
+                right: -50px;
+                width: 50px;
+                transform: translateY(-50%);
+            }
+            .flow-entry::after, .flow-exit::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background-image: radial-gradient(circle, rgba(255,255,255,0.9) 1.5px, transparent 2px);
+                background-size: 20px 4px;
+                animation: flowDotsRight 0.6s linear infinite;
             }
         }
 
-        /* ════════════════════════════════════════════
-           ENGINE NODES
-           ════════════════════════════════════════════ */
-
+        /* Engine Nodes */
         .engine-node {
             position: absolute;
             z-index: 10;
@@ -412,58 +332,37 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s ease;
         }
 
         .engine-node:hover {
             transform: translate(-50%, -50%) scale(1.08);
         }
 
-        .node-core {
-            position: relative;
-            width: clamp(72px, 13vw, 95px);
-            height: clamp(72px, 13vw, 95px);
-        }
-
-        .node-ring {
-            position: absolute;
-            inset: 0;
-            border: 2px solid var(--signal);
+        .node-avatar {
+            width: clamp(70px, 12vw, 85px);
+            height: clamp(70px, 12vw, 85px);
             border-radius: 50%;
-            animation: ringPulse 3s ease-in-out infinite;
+            background: var(--panel);
+            border: 3px solid var(--signal);
+            padding: 3px;
+            box-shadow: 0 0 25px var(--signal-glow), 0 8px 24px rgba(0,0,0,0.3);
+            animation: nodeGlow 3s ease-in-out infinite;
         }
 
-        @keyframes ringPulse {
-            0%, 100% {
-                box-shadow: 0 0 20px var(--signal-dim), inset 0 0 20px var(--signal-dim);
-            }
-            50% {
-                box-shadow: 0 0 35px var(--signal-glow), inset 0 0 25px var(--signal-dim);
-            }
+        @keyframes nodeGlow {
+            0%, 100% { box-shadow: 0 0 20px var(--signal-dim), 0 8px 24px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 0 35px var(--signal-glow), 0 8px 24px rgba(0,0,0,0.3); }
         }
 
-        .node-inner {
-            position: absolute;
-            inset: 4px;
-            background: linear-gradient(135deg, var(--panel), var(--deep));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .node-inner img {
-            width: 72%;
-            height: 72%;
-            object-fit: contain;
+        .node-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             border-radius: 50%;
         }
 
-        .node-meta {
-            margin-top: 10px;
-            text-align: center;
-        }
+        .node-info { margin-top: 8px; text-align: center; }
 
         .node-name {
             font-family: 'IBM Plex Mono', monospace;
@@ -475,61 +374,85 @@
 
         .node-role {
             font-size: clamp(9px, 1vw, 11px);
-            color: var(--text-dim);
-            max-width: 95px;
+            color: var(--text-muted);
+            max-width: 90px;
             line-height: 1.3;
-            margin-top: 2px;
         }
 
-        /* ════════════════════════════════════════════
-           NODE POSITIONS
-           ════════════════════════════════════════════ */
-
-        /* Mobile: Vertical Pipeline */
+        /* Node Positions - Mobile */
         @media (max-width: 1023px) {
-            #engine-atlas { top: 12%; left: 50%; }
-            #engine-merlin { top: 37%; left: 50%; }
-            #engine-argus { top: 62%; left: 50%; }
-            #engine-hephaestus { top: 87%; left: 50%; }
-
+            .diagram-canvas { height: 500px; }
+            #node-atlas { top: 10%; left: 50%; }
+            #node-merlin { top: 35%; left: 50%; }
+            #node-argus { top: 60%; left: 50%; }
+            #node-hephaestus { top: 85%; left: 50%; }
             .node-role { display: none; }
+            #line-trunk, #line-to-merlin, #line-to-argus, #line-to-hephaestus { display: none; }
+            #line-mobile-1, #line-mobile-2, #line-mobile-3 { display: block; }
         }
 
-        /* Desktop: Original Pipeline Layout
-           ────────────────────────────────────────────
-                              [MERLIN]
-                                 ↑
-           ═════► [ATLAS] ══════╬════════════════► ═════
-                                ║
-                          ┌─────╨─────┐
-                          ↓           ↓
-                      [ARGUS]   [HEPHAESTUS]
-           ──────────────────────────────────────────── */
-
+        /* Node Positions - Desktop */
         @media (min-width: 1024px) {
-            #engine-atlas {
+            #node-atlas { top: 50%; left: 12%; }
+            #node-merlin { top: 15%; left: 55%; }
+            #node-argus { top: 85%; left: 42%; }
+            #node-hephaestus { top: 85%; left: 75%; }
+
+            #line-trunk {
                 top: 50%;
-                left: 14%;
+                left: 12%;
+                width: 83%;
+                transform: translateY(-50%);
             }
-            #engine-merlin {
+            #line-to-merlin {
+                left: 55%;
                 top: 15%;
-                left: 52%;
+                height: calc(35% - 2px);
+                transform: translateX(-50%);
             }
-            #engine-argus {
-                top: 85%;
-                left: 38%;
+            #line-to-argus {
+                left: 42%;
+                top: 50%;
+                height: 35%;
+                transform: translateX(-50%);
             }
-            #engine-hephaestus {
-                top: 85%;
-                left: 72%;
+            #line-to-hephaestus {
+                left: 75%;
+                top: 50%;
+                height: 35%;
+                transform: translateX(-50%);
+            }
+            #line-mobile-1, #line-mobile-2, #line-mobile-3 { display: none; }
+        }
+
+        #line-mobile-1, #line-mobile-2, #line-mobile-3 { display: none; }
+
+        @media (max-width: 1023px) {
+            #line-mobile-1 {
+                display: block;
+                left: 50%;
+                top: 15%;
+                height: 15%;
+                transform: translateX(-50%);
+            }
+            #line-mobile-2 {
+                display: block;
+                left: 50%;
+                top: 40%;
+                height: 15%;
+                transform: translateX(-50%);
+            }
+            #line-mobile-3 {
+                display: block;
+                left: 50%;
+                top: 65%;
+                height: 15%;
+                transform: translateX(-50%);
             }
         }
 
-        /* ════════════════════════════════════════════
-           INSIGHT TOOLTIPS
-           ════════════════════════════════════════════ */
-
-        .insight-tooltip {
+        /* Tooltips */
+        .node-tooltip {
             position: absolute;
             width: clamp(200px, 26vw, 260px);
             background: linear-gradient(135deg, var(--surface), var(--panel));
@@ -539,92 +462,54 @@
             opacity: 0;
             visibility: hidden;
             transform: translateY(8px);
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.35s ease;
             z-index: 100;
             pointer-events: none;
             box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
         }
 
-        .insight-tooltip::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 16px;
-            right: 16px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--signal), transparent);
-            opacity: 0.5;
-        }
-
-        .insight-tooltip.active {
+        .node-tooltip.active {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
 
-        .insight-tooltip p {
+        .node-tooltip p {
             font-size: clamp(12px, 1.2vw, 13px);
             color: var(--text-primary);
-            line-height: 1.55;
+            line-height: 1.5;
             margin: 0;
         }
 
-        /* Tooltip positions */
         @media (min-width: 1024px) {
-            #tip-atlas {
+            #tip-atlas, #tip-merlin {
                 bottom: calc(100% + 14px);
                 left: 50%;
                 transform: translateX(-50%) translateY(8px);
             }
-            #tip-atlas.active { transform: translateX(-50%) translateY(0); }
-
-            #tip-merlin {
-                bottom: calc(100% + 14px);
-                left: 50%;
-                transform: translateX(-50%) translateY(8px);
-            }
-            #tip-merlin.active { transform: translateX(-50%) translateY(0); }
-
-            #tip-argus {
+            #tip-atlas.active, #tip-merlin.active { transform: translateX(-50%) translateY(0); }
+            #tip-argus, #tip-hephaestus {
                 top: calc(100% + 14px);
                 left: 50%;
                 transform: translateX(-50%) translateY(-8px);
             }
-            #tip-argus.active { transform: translateX(-50%) translateY(0); }
-
-            #tip-hephaestus {
-                top: calc(100% + 14px);
-                left: 50%;
-                transform: translateX(-50%) translateY(-8px);
-            }
-            #tip-hephaestus.active { transform: translateX(-50%) translateY(0); }
+            #tip-argus.active, #tip-hephaestus.active { transform: translateX(-50%) translateY(0); }
         }
 
         @media (max-width: 1023px) {
-            .insight-tooltip { display: none; }
+            .node-tooltip { display: none; }
         }
 
-        /* ════════════════════════════════════════════
-           OUTCOMES PANEL
-           ════════════════════════════════════════════ */
-
+        /* Outcomes Panel */
         .outcomes-panel { order: 3; }
 
         .outcomes-stream {
             height: clamp(150px, 20vh, 200px);
             overflow: hidden;
-            mask-image: linear-gradient(to bottom,
-                transparent 0%,
-                black 18%,
-                black 82%,
-                transparent 100%
-            );
+            mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
         }
 
-        .outcomes-track {
-            display: flex;
-            flex-direction: column;
-        }
+        .outcomes-track { display: flex; flex-direction: column; }
 
         .outcome-line {
             height: clamp(42px, 5.5vh, 52px);
@@ -632,10 +517,9 @@
             align-items: center;
             padding: 0 14px;
             font-size: clamp(13px, 1.3vw, 15px);
-            color: var(--text-dim);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-muted);
+            transition: all 0.5s ease;
             border-radius: 8px;
-            margin: 2px 0;
         }
 
         .outcome-line.active {
@@ -659,13 +543,10 @@
             margin-top: 16px;
             padding-top: 14px;
             border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .metric-badge {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
             padding: 8px 14px;
@@ -674,139 +555,113 @@
             border-radius: 100px;
             font-family: 'IBM Plex Mono', monospace;
             font-size: 11px;
-            color: var(--signal-bright);
+            color: var(--signal);
         }
 
-        .metric-badge i {
-            font-size: 12px;
-            animation: blink 1.5s infinite;
-        }
+        .metric-badge i { animation: blink 1.5s infinite; }
     </style>
 </head>
 
 <body>
     <div class="atmosphere"></div>
 
-    <div class="command-center">
-        <div class="mission-grid">
+    <div class="main-wrapper">
+        <div class="flow-grid">
 
-            <!-- ════════════════════════════════════════════
-                 SOURCES PANEL
-                 ════════════════════════════════════════════ -->
+            <!-- Sources Panel -->
             <div class="panel sources-panel">
                 <div class="panel-label">Sources</div>
                 <h2 class="panel-title">Data Integrations</h2>
 
-                <div class="source-matrix">
-                    <div class="source-node" title="Splunk"><i class="fas fa-server"></i></div>
-                    <div class="source-node" title="AWS CloudWatch"><i class="fab fa-aws"></i></div>
-                    <div class="source-node" title="Azure Monitor"><i class="fas fa-cloud"></i></div>
-                    <div class="source-node" title="Databricks"><i class="fas fa-cubes"></i></div>
-                    <div class="source-node" title="Confluence"><i class="fab fa-confluence"></i></div>
-                    <div class="source-node" title="Google Drive"><i class="fab fa-google-drive"></i></div>
-                    <div class="source-node" title="Elasticsearch"><i class="fas fa-database"></i></div>
-                    <div class="source-node" title="Slack"><i class="fab fa-slack"></i></div>
-                    <div class="source-node" title="Jira"><i class="fab fa-jira"></i></div>
-                    <div class="source-node" title="Snowflake"><i class="fas fa-snowflake"></i></div>
+                <div class="source-grid">
+                    <div class="source-chip" title="Splunk"><i class="fas fa-server"></i></div>
+                    <div class="source-chip" title="AWS CloudWatch"><i class="fab fa-aws"></i></div>
+                    <div class="source-chip" title="Azure Monitor"><i class="fas fa-cloud"></i></div>
+                    <div class="source-chip" title="Databricks"><i class="fas fa-cubes"></i></div>
+                    <div class="source-chip" title="Confluence"><i class="fab fa-confluence"></i></div>
+                    <div class="source-chip" title="Google Drive"><i class="fab fa-google-drive"></i></div>
+                    <div class="source-chip" title="Elasticsearch"><i class="fas fa-database"></i></div>
+                    <div class="source-chip" title="Slack"><i class="fab fa-slack"></i></div>
+                    <div class="source-chip" title="Jira"><i class="fab fa-jira"></i></div>
+                    <div class="source-chip" title="Snowflake"><i class="fas fa-snowflake"></i></div>
                 </div>
 
                 <div class="source-status">
-                    <span class="status-indicator"></span>
+                    <span class="status-dot"></span>
                     <span>10 sources connected</span>
                 </div>
             </div>
 
-            <!-- ════════════════════════════════════════════
-                 ARCHITECTURE CORE
-                 ════════════════════════════════════════════ -->
-            <div class="architecture-core">
-                <div class="engine-display" id="display">
+            <!-- Architecture Diagram -->
+            <div class="diagram-section">
+                <div class="diagram-canvas">
+                    <div class="flow-entry"></div>
+                    <div class="flow-exit"></div>
 
-                    <!-- Flow Connectors (Sources → Engine → Outcomes) -->
-                    <div class="flow-connector connector-in"></div>
-                    <div class="flow-connector connector-out"></div>
+                    <div id="line-trunk" class="flow-line flow-line-h"></div>
+                    <div id="line-to-merlin" class="flow-line flow-line-v flow-up"></div>
+                    <div id="line-to-argus" class="flow-line flow-line-v flow-down"></div>
+                    <div id="line-to-hephaestus" class="flow-line flow-line-v flow-down"></div>
 
-                    <!-- SVG Flow Lines -->
-                    <svg class="flow-layer" id="flow-svg" preserveAspectRatio="none"></svg>
+                    <div id="line-mobile-1" class="flow-line flow-line-v flow-down"></div>
+                    <div id="line-mobile-2" class="flow-line flow-line-v flow-down"></div>
+                    <div id="line-mobile-3" class="flow-line flow-line-v flow-down"></div>
 
-                    <!-- ATLAS -->
-                    <div class="engine-node" id="engine-atlas">
-                        <div class="node-core">
-                            <div class="node-ring"></div>
-                            <div class="node-inner">
-                                <img src="https://imgur.com/0ya7Fj7.png" alt="Atlas"
-                                     onerror="this.src='https://placehold.co/80/0a1628/38bdf8?text=A&font=roboto'">
-                            </div>
+                    <div class="engine-node" id="node-atlas">
+                        <div class="node-avatar">
+                            <img src="https://imgur.com/0ya7Fj7.png" alt="Atlas" onerror="this.src='https://placehold.co/80/0a1628/38bdf8?text=A'">
                         </div>
-                        <div class="node-meta">
+                        <div class="node-info">
                             <div class="node-name">ATLAS</div>
-                            <div class="node-role">Data Integration & Enrichment</div>
+                            <div class="node-role">Data Integration &amp; Enrichment</div>
                         </div>
-                        <div class="insight-tooltip" id="tip-atlas">
+                        <div class="node-tooltip" id="tip-atlas">
                             <p>Efficiently ingests and normalizes diverse operational data, powering robust AI applications.</p>
                         </div>
                     </div>
 
-                    <!-- MERLIN -->
-                    <div class="engine-node" id="engine-merlin">
-                        <div class="node-core">
-                            <div class="node-ring"></div>
-                            <div class="node-inner">
-                                <img src="https://imgur.com/QyrDXOG.png" alt="Merlin"
-                                     onerror="this.src='https://placehold.co/80/0a1628/38bdf8?text=M&font=roboto'">
-                            </div>
+                    <div class="engine-node" id="node-merlin">
+                        <div class="node-avatar">
+                            <img src="https://imgur.com/QyrDXOG.png" alt="Merlin" onerror="this.src='https://placehold.co/80/0a1628/38bdf8?text=M'">
                         </div>
-                        <div class="node-meta">
+                        <div class="node-info">
                             <div class="node-name">MERLIN</div>
-                            <div class="node-role">Correlation & Insights</div>
+                            <div class="node-role">Correlation &amp; Insights</div>
                         </div>
-                        <div class="insight-tooltip" id="tip-merlin">
+                        <div class="node-tooltip" id="tip-merlin">
                             <p>Delivers instant resolution context, linking symptoms to solutions with AI insights.</p>
                         </div>
                     </div>
 
-                    <!-- ARGUS -->
-                    <div class="engine-node" id="engine-argus">
-                        <div class="node-core">
-                            <div class="node-ring"></div>
-                            <div class="node-inner">
-                                <img src="https://imgur.com/xMcN4Yw.png" alt="Argus"
-                                     onerror="this.src='https://placehold.co/80/0a1628/38bdf8?text=Ar&font=roboto'">
-                            </div>
+                    <div class="engine-node" id="node-argus">
+                        <div class="node-avatar">
+                            <img src="https://imgur.com/xMcN4Yw.png" alt="Argus" onerror="this.src='https://placehold.co/80/0a1628/38bdf8?text=Ar'">
                         </div>
-                        <div class="node-meta">
+                        <div class="node-info">
                             <div class="node-name">ARGUS</div>
-                            <div class="node-role">Noise Reduction & RCA</div>
+                            <div class="node-role">Noise Reduction &amp; RCA</div>
                         </div>
-                        <div class="insight-tooltip" id="tip-argus">
+                        <div class="node-tooltip" id="tip-argus">
                             <p>Proactively signals critical anomalies, cutting through telemetry noise for faster action.</p>
                         </div>
                     </div>
 
-                    <!-- HEPHAESTUS -->
-                    <div class="engine-node" id="engine-hephaestus">
-                        <div class="node-core">
-                            <div class="node-ring"></div>
-                            <div class="node-inner">
-                                <img src="https://imgur.com/7QbiKPT.png" alt="Hephaestus"
-                                     onerror="this.src='https://placehold.co/80/0a1628/38bdf8?text=H&font=roboto'">
-                            </div>
+                    <div class="engine-node" id="node-hephaestus">
+                        <div class="node-avatar">
+                            <img src="https://imgur.com/7QbiKPT.png" alt="Hephaestus" onerror="this.src='https://placehold.co/80/0a1628/38bdf8?text=H'">
                         </div>
-                        <div class="node-meta">
+                        <div class="node-info">
                             <div class="node-name">HEPHAESTUS</div>
-                            <div class="node-role">Action & Automation</div>
+                            <div class="node-role">Action &amp; Automation</div>
                         </div>
-                        <div class="insight-tooltip" id="tip-hephaestus">
+                        <div class="node-tooltip" id="tip-hephaestus">
                             <p>Achieves rapid resilience by automating fixes and resolving issues at machine speed.</p>
                         </div>
                     </div>
-
                 </div>
             </div>
 
-            <!-- ════════════════════════════════════════════
-                 OUTCOMES PANEL
-                 ════════════════════════════════════════════ -->
+            <!-- Outcomes Panel -->
             <div class="panel outcomes-panel">
                 <div class="panel-label">Outcomes</div>
                 <h2 class="panel-title">Business Impact</h2>
@@ -822,100 +677,12 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const svg = document.getElementById('flow-svg');
-            const display = document.getElementById('display');
-
-            // ════════════════════════════════════════════
-            // GET NODE CENTER COORDINATES
-            // ════════════════════════════════════════════
-            function getCenter(id) {
-                const node = document.getElementById(id);
-                const core = node.querySelector('.node-core');
-                const rect = core.getBoundingClientRect();
-                const parentRect = display.getBoundingClientRect();
-
-                return {
-                    x: rect.left - parentRect.left + rect.width / 2,
-                    y: rect.top - parentRect.top + rect.height / 2
-                };
-            }
-
-            // ════════════════════════════════════════════
-            // DRAW FLOW CONNECTIONS
-            // ════════════════════════════════════════════
-            function renderFlow() {
-                const isMobile = window.innerWidth < 1024;
-
-                svg.innerHTML = '';
-
-                const atlas = getCenter('engine-atlas');
-                const merlin = getCenter('engine-merlin');
-                const argus = getCenter('engine-argus');
-                const hephaestus = getCenter('engine-hephaestus');
-
-                let paths;
-
-                if (isMobile) {
-                    // Mobile: straight vertical connections
-                    paths = [
-                        { from: atlas, to: merlin },
-                        { from: merlin, to: argus },
-                        { from: argus, to: hephaestus }
-                    ];
-                } else {
-                    // Desktop: Pipeline with trunk and branches
-                    const trunkY = atlas.y;
-                    const rightEdge = display.offsetWidth - 30;
-
-                    paths = [
-                        // Main horizontal trunk (Atlas to right edge)
-                        { from: atlas, to: { x: rightEdge, y: trunkY }, type: 'trunk' },
-                        // Branch up to Merlin
-                        { from: { x: merlin.x, y: trunkY }, to: merlin, type: 'branch' },
-                        // Branch down to Argus
-                        { from: { x: argus.x, y: trunkY }, to: argus, type: 'branch' },
-                        // Branch down to Hephaestus
-                        { from: { x: hephaestus.x, y: trunkY }, to: hephaestus, type: 'branch' }
-                    ];
-                }
-
-                paths.forEach(p => {
-                    const d = `M ${p.from.x} ${p.from.y} L ${p.to.x} ${p.to.y}`;
-
-                    // Glow path
-                    const glow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    glow.setAttribute('class', 'flow-path-glow');
-                    glow.setAttribute('d', d);
-                    svg.appendChild(glow);
-
-                    // Main animated path
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    line.setAttribute('class', 'flow-path flow-animated');
-                    line.setAttribute('d', d);
-                    svg.appendChild(line);
-                });
-            }
-
-            // Initial render
-            setTimeout(renderFlow, 100);
-
-            // Redraw on resize
-            let resizeTimer;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(renderFlow, 80);
-            });
-
-            // ════════════════════════════════════════════
-            // TOOLTIP CYCLING
-            // ════════════════════════════════════════════
-            const engines = ['engine-atlas', 'engine-merlin', 'engine-argus', 'engine-hephaestus'];
+            const nodes = ['node-atlas', 'node-merlin', 'node-argus', 'node-hephaestus'];
             const tips = ['tip-atlas', 'tip-merlin', 'tip-argus', 'tip-hephaestus'];
             let tipIndex = 0;
             let tipInterval;
@@ -929,58 +696,32 @@
 
             function cycleTips() {
                 if (window.innerWidth < 1024) {
-                    tips.forEach(id => {
-                        const el = document.getElementById(id);
-                        if (el) el.classList.remove('active');
-                    });
+                    tips.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('active'); });
                     return;
                 }
                 showTip(tipIndex);
-                tipIndex = (tipIndex + 1) % engines.length;
+                tipIndex = (tipIndex + 1) % nodes.length;
             }
 
-            // Hover interactions
-            engines.forEach((id, idx) => {
+            nodes.forEach((id, idx) => {
                 const node = document.getElementById(id);
                 if (node) {
-                    node.addEventListener('mouseenter', () => {
-                        clearInterval(tipInterval);
-                        showTip(idx);
-                    });
-                    node.addEventListener('mouseleave', () => {
-                        tipInterval = setInterval(cycleTips, 3800);
-                    });
+                    node.addEventListener('mouseenter', () => { clearInterval(tipInterval); showTip(idx); });
+                    node.addEventListener('mouseleave', () => { tipInterval = setInterval(cycleTips, 4000); });
                 }
             });
 
-            // Start cycling
             if (window.innerWidth >= 1024) {
-                tipInterval = setInterval(cycleTips, 3800);
-                setTimeout(cycleTips, 600);
+                tipInterval = setInterval(cycleTips, 4000);
+                setTimeout(cycleTips, 500);
             }
 
             window.addEventListener('resize', () => {
                 clearInterval(tipInterval);
-                if (window.innerWidth >= 1024) {
-                    tipInterval = setInterval(cycleTips, 3800);
-                }
+                if (window.innerWidth >= 1024) tipInterval = setInterval(cycleTips, 4000);
             });
 
-            // ════════════════════════════════════════════
-            // OUTCOMES CAROUSEL
-            // ════════════════════════════════════════════
-            const outcomes = [
-                "Faster Incident Resolution",
-                "Enhanced Operational Efficiency",
-                "Improved System Reliability",
-                "Reduced Operational Costs",
-                "Context-aware Correlation",
-                "Real-time On-call Guidance",
-                "Predictive Log Analytics",
-                "Anomaly Detection",
-                "Root Cause Analysis"
-            ];
-
+            const outcomes = ["Faster Incident Resolution", "Enhanced Operational Efficiency", "Improved System Reliability", "Reduced Operational Costs", "Context-aware Correlation", "Real-time On-call Guidance", "Predictive Log Analytics", "Anomaly Detection", "Root Cause Analysis"];
             const track = document.getElementById('outcomes-track');
             const tripled = [...outcomes, ...outcomes, ...outcomes];
 
@@ -996,7 +737,7 @@
             const lineH = 46;
 
             function updateOutcomes() {
-                track.style.transition = 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1)';
+                track.style.transition = 'transform 0.55s ease';
                 track.style.transform = `translateY(-${outcomeIdx * lineH}px)`;
                 lines.forEach((line, i) => line.classList.toggle('active', i === outcomeIdx + 1));
             }
@@ -1004,7 +745,6 @@
             function advanceOutcome() {
                 outcomeIdx++;
                 updateOutcomes();
-
                 if (outcomeIdx >= outcomes.length * 2) {
                     setTimeout(() => {
                         track.style.transition = 'none';

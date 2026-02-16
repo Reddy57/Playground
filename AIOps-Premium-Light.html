@@ -3,56 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIOps Architecture Flow - Premium</title>
+    <title>AIOps Architecture Flow - Premium Light</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
         :root {
             --bg-base: #fafbfc;
             --bg-elevated: #ffffff;
             --bg-subtle: #f1f5f9;
-
             --accent-primary: #0ea5e9;
             --accent-secondary: #6366f1;
             --accent-success: #10b981;
-            --accent-warning: #f59e0b;
-
             --text-primary: #0f172a;
             --text-secondary: #475569;
             --text-muted: #94a3b8;
-
             --border-default: #e2e8f0;
             --border-accent: rgba(14, 165, 233, 0.3);
-
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
             --shadow-glow: 0 0 40px rgba(14, 165, 233, 0.15);
-
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 20px;
-            --radius-xl: 28px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'DM Sans', -apple-system, sans-serif;
+            font-family: 'DM Sans', sans-serif;
             background: var(--bg-base);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
-            line-height: 1.5;
         }
 
-        /* Decorative background elements */
         .bg-decoration {
             position: fixed;
             inset: 0;
@@ -84,7 +67,6 @@
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(14, 165, 233, 0.1));
         }
 
-        /* Layout */
         .app-container {
             position: relative;
             z-index: 1;
@@ -92,16 +74,16 @@
             padding: clamp(16px, 4vw, 40px);
             display: flex;
             flex-direction: column;
+            justify-content: center;
         }
 
         .content-grid {
-            flex: 1;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr;
             gap: clamp(20px, 4vw, 40px);
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
         }
 
         @media (min-width: 900px) {
@@ -111,17 +93,11 @@
             }
         }
 
-        @media (min-width: 1200px) {
-            .content-grid {
-                grid-template-columns: 320px 1fr 320px;
-            }
-        }
-
         /* Section Cards */
         .section-card {
             background: var(--bg-elevated);
             border: 1px solid var(--border-default);
-            border-radius: var(--radius-xl);
+            border-radius: 24px;
             padding: clamp(20px, 3vw, 32px);
             box-shadow: var(--shadow-md);
             position: relative;
@@ -173,13 +149,7 @@
         }
 
         /* Sources Section */
-        .sources-section {
-            order: 1;
-        }
-
-        @media (min-width: 900px) {
-            .sources-section { order: 1; }
-        }
+        .sources-section { order: 1; }
 
         .integration-grid {
             display: grid;
@@ -188,20 +158,18 @@
         }
 
         @media (min-width: 900px) {
-            .integration-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
+            .integration-grid { grid-template-columns: repeat(4, 1fr); }
         }
 
         .integration-chip {
             aspect-ratio: 1;
             background: var(--bg-subtle);
             border: 1px solid var(--border-default);
-            border-radius: var(--radius-md);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s ease;
             cursor: pointer;
         }
 
@@ -217,19 +185,17 @@
             transition: transform 0.25s;
         }
 
-        .integration-chip:hover i {
-            transform: scale(1.1);
-        }
+        .integration-chip:hover i { transform: scale(1.1); }
 
-        /* Icon colors */
+        /* Icon colors BY DEFAULT */
         .integration-chip:nth-child(1) i { color: #ED1B24; }
         .integration-chip:nth-child(2) i { color: #FF9900; }
         .integration-chip:nth-child(3) i { color: #0078D4; }
         .integration-chip:nth-child(4) i { color: #FF3621; }
-        .integration-chip:nth-child(5) i { color: #172B4D; }
+        .integration-chip:nth-child(5) i { color: #2684FF; }
         .integration-chip:nth-child(6) i { color: #34A853; }
         .integration-chip:nth-child(7) i { color: #00BFB3; }
-        .integration-chip:nth-child(8) i { color: #4A154B; }
+        .integration-chip:nth-child(8) i { color: #E01E5A; }
         .integration-chip:nth-child(9) i { color: #0052CC; }
         .integration-chip:nth-child(10) i { color: #29B5E8; }
 
@@ -259,44 +225,83 @@
         .diagram-canvas {
             position: relative;
             width: 100%;
-            max-width: 550px;
-            aspect-ratio: 1.2;
+            max-width: 600px;
+            height: 420px;
         }
 
         @media (min-width: 900px) {
-            .diagram-canvas {
-                aspect-ratio: 1.4;
-            }
+            .diagram-canvas { height: 380px; }
         }
 
-        /* Connection Lines SVG */
-        .connections-layer {
+        /* Flow Lines */
+        @keyframes flowRight {
+            0% { background-position: 0 center; }
+            100% { background-position: 20px center; }
+        }
+
+        @keyframes flowDown {
+            0% { background-position: center 0; }
+            100% { background-position: center 20px; }
+        }
+
+        @keyframes flowUp {
+            0% { background-position: center 20px; }
+            100% { background-position: center 0; }
+        }
+
+        .flow-line {
+            position: absolute;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 3px;
+            z-index: 1;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2);
+        }
+
+        .flow-line::after {
+            content: '';
             position: absolute;
             inset: 0;
-            z-index: 1;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.9) 1.5px, transparent 2px);
+            background-repeat: repeat;
+            border-radius: 3px;
         }
 
-        .connection-path {
-            fill: none;
-            stroke: url(#connectionGradient);
-            stroke-width: 3;
-            stroke-linecap: round;
+        .flow-line-h { height: 4px; }
+        .flow-line-h::after {
+            background-size: 20px 4px;
+            animation: flowRight 0.6s linear infinite;
         }
 
-        .connection-path-bg {
-            fill: none;
-            stroke: var(--border-default);
-            stroke-width: 6;
-            stroke-linecap: round;
+        .flow-line-v { width: 4px; background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary)); }
+        .flow-line-v.flow-down::after {
+            background-size: 4px 20px;
+            animation: flowDown 0.6s linear infinite;
+        }
+        .flow-line-v.flow-up::after {
+            background-size: 4px 20px;
+            animation: flowUp 0.6s linear infinite;
         }
 
-        .connection-animated {
-            stroke-dasharray: 12 8;
-            animation: flowAnimation 1.2s linear infinite;
-        }
+        .flow-entry, .flow-exit { display: none; }
 
-        @keyframes flowAnimation {
-            to { stroke-dashoffset: -20; }
+        @media (min-width: 900px) {
+            .flow-entry, .flow-exit {
+                display: block;
+                position: absolute;
+                height: 4px;
+                background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+                z-index: 1;
+            }
+            .flow-entry { top: 50%; left: -50px; width: 50px; transform: translateY(-50%); }
+            .flow-exit { top: 50%; right: -50px; width: 50px; transform: translateY(-50%); }
+            .flow-entry::after, .flow-exit::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background-image: radial-gradient(circle, rgba(255,255,255,0.9) 1.5px, transparent 2px);
+                background-size: 20px 4px;
+                animation: flowRight 0.6s linear infinite;
+            }
         }
 
         /* Engine Nodes */
@@ -308,7 +313,7 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s ease;
         }
 
         .engine-node:hover {
@@ -322,10 +327,7 @@
             border-radius: 50%;
             background: var(--bg-elevated);
             border: 3px solid var(--accent-primary);
-            box-shadow:
-                var(--shadow-lg),
-                0 0 0 8px rgba(14, 165, 233, 0.1),
-                inset 0 0 20px rgba(14, 165, 233, 0.05);
+            box-shadow: var(--shadow-lg), 0 0 0 8px rgba(14, 165, 233, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -333,11 +335,7 @@
         }
 
         .engine-node:hover .node-ring {
-            box-shadow:
-                var(--shadow-lg),
-                0 0 0 12px rgba(14, 165, 233, 0.15),
-                0 0 40px rgba(14, 165, 233, 0.2),
-                inset 0 0 20px rgba(14, 165, 233, 0.05);
+            box-shadow: var(--shadow-lg), 0 0 0 12px rgba(14, 165, 233, 0.15), 0 0 40px rgba(14, 165, 233, 0.2);
         }
 
         .node-ring img {
@@ -347,10 +345,7 @@
             border-radius: 50%;
         }
 
-        .node-info {
-            margin-top: 10px;
-            text-align: center;
-        }
+        .node-info { margin-top: 10px; text-align: center; }
 
         .node-name {
             font-family: 'Space Grotesk', sans-serif;
@@ -366,11 +361,17 @@
             line-height: 1.3;
         }
 
-        /* Node Positions - Mobile (Vertical) */
-        #node-atlas { top: 12%; left: 50%; }
-        #node-merlin { top: 38%; left: 50%; }
-        #node-argus { top: 64%; left: 50%; }
-        #node-hephaestus { top: 90%; left: 50%; }
+        /* Node Positions - Mobile */
+        @media (max-width: 899px) {
+            .diagram-canvas { height: 500px; }
+            #node-atlas { top: 10%; left: 50%; }
+            #node-merlin { top: 35%; left: 50%; }
+            #node-argus { top: 60%; left: 50%; }
+            #node-hephaestus { top: 85%; left: 50%; }
+            .node-role { display: none; }
+            #line-trunk, #line-to-merlin, #line-to-argus, #line-to-hephaestus { display: none; }
+            #line-mobile-1, #line-mobile-2, #line-mobile-3 { display: block; }
+        }
 
         /* Node Positions - Desktop */
         @media (min-width: 900px) {
@@ -378,23 +379,36 @@
             #node-merlin { top: 18%; left: 50%; }
             #node-argus { top: 82%; left: 40%; }
             #node-hephaestus { top: 82%; left: 72%; }
+
+            #line-trunk { top: 50%; left: 10%; width: 85%; transform: translateY(-50%); }
+            #line-to-merlin { left: 50%; top: 18%; height: calc(32% - 2px); transform: translateX(-50%); }
+            #line-to-argus { left: 40%; top: 50%; height: 32%; transform: translateX(-50%); }
+            #line-to-hephaestus { left: 72%; top: 50%; height: 32%; transform: translateX(-50%); }
+            #line-mobile-1, #line-mobile-2, #line-mobile-3 { display: none; }
         }
 
-        /* Insight Cards (Tooltips) */
+        #line-mobile-1, #line-mobile-2, #line-mobile-3 { display: none; }
+
+        @media (max-width: 899px) {
+            #line-mobile-1 { display: block; left: 50%; top: 15%; height: 15%; transform: translateX(-50%); }
+            #line-mobile-2 { display: block; left: 50%; top: 40%; height: 15%; transform: translateX(-50%); }
+            #line-mobile-3 { display: block; left: 50%; top: 65%; height: 15%; transform: translateX(-50%); }
+        }
+
+        /* Insight Cards */
         .insight-card {
             position: absolute;
             width: clamp(180px, 30vw, 240px);
             background: var(--bg-elevated);
             border: 1px solid var(--border-default);
-            border-radius: var(--radius-lg);
+            border-radius: 16px;
             padding: 14px 16px;
             box-shadow: var(--shadow-lg);
             opacity: 0;
             visibility: hidden;
             transform: translateY(8px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             z-index: 50;
-            pointer-events: none;
         }
 
         .insight-card.visible {
@@ -410,52 +424,36 @@
             margin: 0;
         }
 
-        .insight-card::before {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-default);
-            border-right: none;
-            border-top: none;
-            transform: rotate(45deg);
+        @media (min-width: 900px) {
+            #insight-atlas, #insight-merlin {
+                bottom: calc(100% + 14px);
+                left: 50%;
+                transform: translateX(-50%) translateY(8px);
+            }
+            #insight-atlas.visible, #insight-merlin.visible { transform: translateX(-50%) translateY(0); }
+            #insight-argus, #insight-hephaestus {
+                top: calc(100% + 14px);
+                left: 50%;
+                transform: translateX(-50%) translateY(-8px);
+            }
+            #insight-argus.visible, #insight-hephaestus.visible { transform: translateX(-50%) translateY(0); }
         }
 
-        .insight-top::before {
-            bottom: -7px;
-            left: 50%;
-            margin-left: -6px;
-            transform: rotate(-45deg);
-        }
-
-        .insight-bottom::before {
-            top: -7px;
-            left: 50%;
-            margin-left: -6px;
-            transform: rotate(135deg);
+        @media (max-width: 899px) {
+            .insight-card { display: none; }
         }
 
         /* Outcomes Section */
-        .outcomes-section {
-            order: 3;
-        }
+        .outcomes-section { order: 3; }
 
         .outcome-carousel {
             position: relative;
             height: clamp(140px, 20vh, 200px);
             overflow: hidden;
-            mask-image: linear-gradient(to bottom,
-                transparent 0%,
-                black 15%,
-                black 85%,
-                transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
         }
 
-        .outcome-track {
-            display: flex;
-            flex-direction: column;
-        }
+        .outcome-track { display: flex; flex-direction: column; }
 
         .outcome-item {
             height: clamp(40px, 5vh, 50px);
@@ -465,7 +463,7 @@
             font-size: clamp(13px, 1.3vw, 15px);
             color: var(--text-muted);
             transition: all 0.4s ease;
-            border-radius: var(--radius-sm);
+            border-radius: 8px;
             margin: 2px 0;
         }
 
@@ -497,21 +495,6 @@
             font-size: clamp(11px, 1.2vw, 13px);
             color: var(--accent-success);
             font-weight: 500;
-        }
-
-        .outcome-badge i {
-            font-size: 14px;
-        }
-
-        /* Hide node role text on mobile */
-        @media (max-width: 899px) {
-            .node-role {
-                display: none;
-            }
-
-            .insight-card {
-                display: none;
-            }
         }
     </style>
 </head>
@@ -552,18 +535,18 @@
             <!-- Architecture Diagram -->
             <div class="diagram-section">
                 <div class="diagram-canvas" id="diagram">
+                    <div class="flow-entry"></div>
+                    <div class="flow-exit"></div>
 
-                    <!-- SVG Connections -->
-                    <svg class="connections-layer" id="svg-connections" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#0ea5e9" />
-                                <stop offset="100%" stop-color="#6366f1" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
+                    <div id="line-trunk" class="flow-line flow-line-h"></div>
+                    <div id="line-to-merlin" class="flow-line flow-line-v flow-up"></div>
+                    <div id="line-to-argus" class="flow-line flow-line-v flow-down"></div>
+                    <div id="line-to-hephaestus" class="flow-line flow-line-v flow-down"></div>
 
-                    <!-- Engine Nodes -->
+                    <div id="line-mobile-1" class="flow-line flow-line-v flow-down"></div>
+                    <div id="line-mobile-2" class="flow-line flow-line-v flow-down"></div>
+                    <div id="line-mobile-3" class="flow-line flow-line-v flow-down"></div>
+
                     <div class="engine-node" id="node-atlas">
                         <div class="node-ring">
                             <img src="https://imgur.com/0ya7Fj7.png" alt="Atlas" onerror="this.src='https://placehold.co/80x80/0ea5e9/white?text=A'">
@@ -571,6 +554,9 @@
                         <div class="node-info">
                             <div class="node-name">Atlas</div>
                             <div class="node-role">Data Integration</div>
+                        </div>
+                        <div class="insight-card" id="insight-atlas">
+                            <p>Efficiently ingests and normalizes diverse operational data, powering robust AI applications.</p>
                         </div>
                     </div>
 
@@ -580,7 +566,10 @@
                         </div>
                         <div class="node-info">
                             <div class="node-name">Merlin</div>
-                            <div class="node-role">Correlation & Insights</div>
+                            <div class="node-role">Correlation &amp; Insights</div>
+                        </div>
+                        <div class="insight-card" id="insight-merlin">
+                            <p>Delivers instant resolution context, linking symptoms to solutions with AI insights.</p>
                         </div>
                     </div>
 
@@ -592,6 +581,9 @@
                             <div class="node-name">Argus</div>
                             <div class="node-role">Noise Reduction</div>
                         </div>
+                        <div class="insight-card" id="insight-argus">
+                            <p>Proactively signals critical anomalies, cutting through telemetry noise for faster action.</p>
+                        </div>
                     </div>
 
                     <div class="engine-node" id="node-hephaestus">
@@ -600,25 +592,11 @@
                         </div>
                         <div class="node-info">
                             <div class="node-name">Hephaestus</div>
-                            <div class="node-role">Action & Automation</div>
+                            <div class="node-role">Action &amp; Automation</div>
                         </div>
-                    </div>
-
-                    <!-- Insight Cards -->
-                    <div class="insight-card insight-top" id="insight-atlas" style="top: 0; left: 50%; transform: translateX(-50%);">
-                        <p>Efficiently ingests and normalizes diverse operational data, powering robust AI applications.</p>
-                    </div>
-
-                    <div class="insight-card insight-top" id="insight-merlin" style="top: -5%; left: 50%; transform: translateX(-50%);">
-                        <p>Delivers instant resolution context, linking symptoms to solutions with AI insights.</p>
-                    </div>
-
-                    <div class="insight-card insight-bottom" id="insight-argus" style="bottom: 0; left: 25%; transform: translateX(-50%);">
-                        <p>Proactively signals critical anomalies, cutting through telemetry noise for faster action.</p>
-                    </div>
-
-                    <div class="insight-card insight-bottom" id="insight-hephaestus" style="bottom: 0; right: 5%;">
-                        <p>Achieves rapid resilience by automating fixes and resolving issues at machine speed.</p>
+                        <div class="insight-card" id="insight-hephaestus">
+                            <p>Achieves rapid resilience by automating fixes and resolving issues at machine speed.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -642,143 +620,35 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const svg = document.getElementById('svg-connections');
-            const diagram = document.getElementById('diagram');
-
-            // Get node center position
-            function getNodeCenter(id) {
-                const node = document.getElementById(id);
-                const ring = node.querySelector('.node-ring');
-                const rect = ring.getBoundingClientRect();
-                const parentRect = diagram.getBoundingClientRect();
-
-                return {
-                    x: rect.left - parentRect.left + rect.width / 2,
-                    y: rect.top - parentRect.top + rect.height / 2
-                };
-            }
-
-            // Draw connections
-            function drawConnections() {
-                const isMobile = window.innerWidth < 900;
-                svg.innerHTML = `
-                    <defs>
-                        <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="#0ea5e9" />
-                            <stop offset="100%" stop-color="#6366f1" />
-                        </linearGradient>
-                    </defs>
-                `;
-
-                const atlas = getNodeCenter('node-atlas');
-                const merlin = getNodeCenter('node-merlin');
-                const argus = getNodeCenter('node-argus');
-                const hephaestus = getNodeCenter('node-hephaestus');
-
-                const connections = isMobile ? [
-                    { from: atlas, to: merlin },
-                    { from: merlin, to: argus },
-                    { from: argus, to: hephaestus }
-                ] : [
-                    { from: atlas, to: merlin },
-                    { from: atlas, to: argus },
-                    { from: merlin, to: hephaestus },
-                    { from: argus, to: hephaestus }
-                ];
-
-                connections.forEach(conn => {
-                    // Background path
-                    const bgPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    bgPath.setAttribute('class', 'connection-path-bg');
-
-                    // Main path
-                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    path.setAttribute('class', 'connection-path connection-animated');
-
-                    // Create curved path
-                    const midX = (conn.from.x + conn.to.x) / 2;
-                    const midY = (conn.from.y + conn.to.y) / 2;
-                    const curveOffset = isMobile ? 30 : 50;
-                    const offsetX = conn.from.x < conn.to.x ? -curveOffset : curveOffset;
-
-                    const d = `M ${conn.from.x} ${conn.from.y} Q ${midX + offsetX} ${midY} ${conn.to.x} ${conn.to.y}`;
-
-                    bgPath.setAttribute('d', d);
-                    path.setAttribute('d', d);
-
-                    svg.appendChild(bgPath);
-                    svg.appendChild(path);
-                });
-            }
-
-            // Initial draw after DOM settles
-            setTimeout(drawConnections, 100);
-
-            // Redraw on resize
-            let resizeTimeout;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(drawConnections, 100);
-            });
-
-            // Insight card cycling
-            const insightCards = {
-                'node-atlas': 'insight-atlas',
-                'node-merlin': 'insight-merlin',
-                'node-argus': 'insight-argus',
-                'node-hephaestus': 'insight-hephaestus'
-            };
-
-            const nodeIds = Object.keys(insightCards);
-            let currentInsightIndex = 0;
+            const nodeIds = ['node-atlas', 'node-merlin', 'node-argus', 'node-hephaestus'];
+            const insightIds = ['insight-atlas', 'insight-merlin', 'insight-argus', 'insight-hephaestus'];
+            let currentInsight = 0;
             let insightInterval;
 
             function showInsight(index) {
-                Object.values(insightCards).forEach(id => {
-                    document.getElementById(id).classList.remove('visible');
+                insightIds.forEach((id, i) => {
+                    document.getElementById(id).classList.toggle('visible', i === index);
                 });
-
-                const cardId = insightCards[nodeIds[index]];
-                document.getElementById(cardId).classList.add('visible');
             }
 
             function cycleInsights() {
                 if (window.innerWidth < 900) return;
-                showInsight(currentInsightIndex);
-                currentInsightIndex = (currentInsightIndex + 1) % nodeIds.length;
+                showInsight(currentInsight);
+                currentInsight = (currentInsight + 1) % nodeIds.length;
             }
 
-            // Hover interactions
             nodeIds.forEach((nodeId, index) => {
                 const node = document.getElementById(nodeId);
-                node.addEventListener('mouseenter', () => {
-                    clearInterval(insightInterval);
-                    showInsight(index);
-                });
-                node.addEventListener('mouseleave', () => {
-                    insightInterval = setInterval(cycleInsights, 3500);
-                });
+                node.addEventListener('mouseenter', () => { clearInterval(insightInterval); showInsight(index); });
+                node.addEventListener('mouseleave', () => { insightInterval = setInterval(cycleInsights, 3500); });
             });
 
-            // Start cycling
             if (window.innerWidth >= 900) {
                 insightInterval = setInterval(cycleInsights, 3500);
                 cycleInsights();
             }
 
-            // Outcome Carousel
-            const outcomes = [
-                "Faster Incident Resolution",
-                "Enhanced Operational Efficiency",
-                "Improved System Reliability",
-                "Reduced Operational Costs",
-                "Context-aware Correlation",
-                "Real-time On-call Guidance",
-                "Predictive Log Analytics",
-                "Anomaly Detection",
-                "Root Cause Analysis"
-            ];
-
+            const outcomes = ["Faster Incident Resolution", "Enhanced Operational Efficiency", "Improved System Reliability", "Reduced Operational Costs", "Context-aware Correlation", "Real-time On-call Guidance", "Predictive Log Analytics", "Anomaly Detection", "Root Cause Analysis"];
             const track = document.getElementById('outcome-track');
             const tripled = [...outcomes, ...outcomes, ...outcomes];
 
@@ -789,34 +659,30 @@
                 track.appendChild(item);
             });
 
-            let outcomeIndex = outcomes.length;
-            const items = track.querySelectorAll('.outcome-item');
+            const allItems = track.querySelectorAll('.outcome-item');
+            let idx = outcomes.length;
             const itemHeight = 44;
 
-            function updateOutcomes() {
+            function updateCarousel() {
                 track.style.transition = 'transform 0.5s ease';
-                track.style.transform = `translateY(-${outcomeIndex * itemHeight}px)`;
-
-                items.forEach((item, i) => {
-                    item.classList.toggle('active', i === outcomeIndex + 1);
-                });
+                track.style.transform = `translateY(-${idx * itemHeight}px)`;
+                allItems.forEach((item, i) => item.classList.toggle('active', i === idx + 1));
             }
 
-            function advanceOutcome() {
-                outcomeIndex++;
-                updateOutcomes();
-
-                if (outcomeIndex >= outcomes.length * 2) {
+            function advanceCarousel() {
+                idx++;
+                updateCarousel();
+                if (idx >= outcomes.length * 2) {
                     setTimeout(() => {
                         track.style.transition = 'none';
-                        outcomeIndex = outcomes.length;
-                        track.style.transform = `translateY(-${outcomeIndex * itemHeight}px)`;
+                        idx = outcomes.length;
+                        track.style.transform = `translateY(-${idx * itemHeight}px)`;
                     }, 500);
                 }
             }
 
-            updateOutcomes();
-            setInterval(advanceOutcome, 3000);
+            updateCarousel();
+            setInterval(advanceCarousel, 3000);
         });
     </script>
 </body>

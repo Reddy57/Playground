@@ -3,34 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIOps Flow - Modern Glass</title>
+    <title>AIOps Flow - Glass Modern</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
         :root {
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-hover: rgba(255, 255, 255, 0.06);
-
             --cyan: #22d3ee;
             --purple: #a855f7;
             --pink: #ec4899;
-            --orange: #f97316;
-            --green: #22c55e;
-
             --text-bright: #ffffff;
             --text-mid: rgba(255, 255, 255, 0.8);
             --text-dim: rgba(255, 255, 255, 0.5);
-            --text-faint: rgba(255, 255, 255, 0.3);
+            --signal: #22d3ee;
+            --signal-glow: rgba(34, 211, 238, 0.5);
+            --signal-dim: rgba(34, 211, 238, 0.15);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -40,7 +33,6 @@
             overflow-x: hidden;
         }
 
-        /* Animated gradient background */
         .bg-animation {
             position: fixed;
             inset: 0;
@@ -62,27 +54,15 @@
             background: linear-gradient(135deg, var(--purple), var(--pink));
             top: -30%;
             left: -20%;
-            animation-delay: 0s;
         }
 
         .orb-2 {
             width: 50vw;
             height: 50vw;
-            background: linear-gradient(135deg, var(--cyan), var(--green));
+            background: linear-gradient(135deg, var(--cyan), #22c55e);
             bottom: -25%;
             right: -15%;
             animation-delay: -7s;
-        }
-
-        .orb-3 {
-            width: 35vw;
-            height: 35vw;
-            background: linear-gradient(135deg, var(--orange), var(--pink));
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: -14s;
-            opacity: 0.2;
         }
 
         @keyframes float {
@@ -91,7 +71,6 @@
             66% { transform: translate(-20px, 20px) scale(0.95); }
         }
 
-        /* Noise overlay */
         .noise-overlay {
             position: fixed;
             inset: 0;
@@ -101,7 +80,6 @@
             z-index: 1;
         }
 
-        /* Main Layout */
         .app-shell {
             position: relative;
             z-index: 2;
@@ -109,6 +87,7 @@
             padding: clamp(16px, 4vw, 48px);
             display: flex;
             flex-direction: column;
+            justify-content: center;
         }
 
         .layout-grid {
@@ -126,12 +105,6 @@
             .layout-grid {
                 grid-template-columns: 300px 1fr 300px;
                 align-items: center;
-            }
-        }
-
-        @media (min-width: 1400px) {
-            .layout-grid {
-                grid-template-columns: 340px 1fr 340px;
             }
         }
 
@@ -154,10 +127,7 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg,
-                transparent,
-                rgba(255, 255, 255, 0.3),
-                transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
         }
 
         .panel-label {
@@ -190,12 +160,8 @@
             line-height: 1.2;
         }
 
-        /* Sources Grid */
+        /* Sources */
         .sources-panel { order: 1; }
-
-        @media (min-width: 1024px) {
-            .sources-panel { order: 1; }
-        }
 
         .source-grid {
             display: grid;
@@ -204,15 +170,7 @@
         }
 
         @media (min-width: 1024px) {
-            .source-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (min-width: 1400px) {
-            .source-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
+            .source-grid { grid-template-columns: repeat(3, 1fr); }
         }
 
         .source-icon {
@@ -225,54 +183,32 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .source-icon::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at center, var(--glass-hover), transparent);
-            opacity: 0;
-            transition: opacity 0.4s;
         }
 
         .source-icon:hover {
             transform: translateY(-4px) scale(1.05);
             border-color: var(--cyan);
-            box-shadow:
-                0 20px 40px rgba(0, 0, 0, 0.3),
-                0 0 40px rgba(34, 211, 238, 0.15);
-        }
-
-        .source-icon:hover::before {
-            opacity: 1;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 40px rgba(34, 211, 238, 0.15);
         }
 
         .source-icon i {
             font-size: clamp(20px, 2.5vw, 28px);
-            color: var(--text-dim);
-            transition: all 0.4s;
-            z-index: 1;
+            transition: transform 0.4s;
         }
 
-        .source-icon:hover i {
-            color: var(--text-bright);
-            transform: scale(1.1);
-        }
+        .source-icon:hover i { transform: scale(1.1); }
 
-        /* Individual icon colors on hover */
-        .source-icon:nth-child(1):hover i { color: #ED1B24; }
-        .source-icon:nth-child(2):hover i { color: #FF9900; }
-        .source-icon:nth-child(3):hover i { color: #0078D4; }
-        .source-icon:nth-child(4):hover i { color: #FF3621; }
-        .source-icon:nth-child(5):hover i { color: #172B4D; }
-        .source-icon:nth-child(6):hover i { color: #34A853; }
-        .source-icon:nth-child(7):hover i { color: #00BFB3; }
-        .source-icon:nth-child(8):hover i { color: #4A154B; }
-        .source-icon:nth-child(9):hover i { color: #0052CC; }
-        .source-icon:nth-child(10):hover i { color: #29B5E8; }
+        /* Icon colors BY DEFAULT */
+        .source-icon:nth-child(1) i { color: #ED1B24; }
+        .source-icon:nth-child(2) i { color: #FF9900; }
+        .source-icon:nth-child(3) i { color: #0078D4; }
+        .source-icon:nth-child(4) i { color: #FF3621; }
+        .source-icon:nth-child(5) i { color: #2684FF; }
+        .source-icon:nth-child(6) i { color: #34A853; }
+        .source-icon:nth-child(7) i { color: #00BFB3; }
+        .source-icon:nth-child(8) i { color: #E01E5A; }
+        .source-icon:nth-child(9) i { color: #0052CC; }
+        .source-icon:nth-child(10) i { color: #29B5E8; }
 
         .source-count {
             margin-top: clamp(20px, 3vw, 28px);
@@ -308,45 +244,92 @@
             position: relative;
             width: 100%;
             max-width: 600px;
-            aspect-ratio: 1.1;
+            height: 450px;
         }
 
         @media (min-width: 1024px) {
-            .architecture-stage {
-                aspect-ratio: 1.4;
-            }
+            .architecture-stage { height: 400px; }
         }
 
-        /* SVG Lines */
-        .connection-lines {
-            position: absolute;
-            inset: 0;
-            z-index: 1;
+        /* Flow Lines - CSS Animated */
+        @keyframes flowDotsRight {
+            0% { background-position: 0 center; }
+            100% { background-position: 20px center; }
+        }
+
+        @keyframes flowDotsDown {
+            0% { background-position: center 0; }
+            100% { background-position: center 20px; }
+        }
+
+        @keyframes flowDotsUp {
+            0% { background-position: center 20px; }
+            100% { background-position: center 0; }
         }
 
         .flow-line {
-            fill: none;
-            stroke: url(#flowGradient);
-            stroke-width: 3;
-            stroke-linecap: round;
+            position: absolute;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+            border-radius: 3px;
+            z-index: 1;
+            box-shadow: 0 0 15px var(--signal-dim);
         }
 
-        .flow-line-glow {
-            fill: none;
-            stroke: var(--cyan);
-            stroke-width: 12;
-            stroke-linecap: round;
-            opacity: 0.15;
-            filter: blur(8px);
+        .flow-line::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.9) 1.5px, transparent 2px);
+            background-repeat: repeat;
+            border-radius: 3px;
         }
 
-        .flow-line-animated {
-            stroke-dasharray: 15 10;
-            animation: dash 1s linear infinite;
+        .flow-line-h { height: 4px; }
+        .flow-line-h::after {
+            background-size: 20px 4px;
+            animation: flowDotsRight 0.6s linear infinite;
         }
 
-        @keyframes dash {
-            to { stroke-dashoffset: -25; }
+        .flow-line-v { width: 4px; background: linear-gradient(180deg, var(--cyan), var(--purple)); }
+        .flow-line-v.flow-down::after {
+            background-size: 4px 20px;
+            animation: flowDotsDown 0.6s linear infinite;
+        }
+        .flow-line-v.flow-up::after {
+            background-size: 4px 20px;
+            animation: flowDotsUp 0.6s linear infinite;
+        }
+
+        .flow-entry, .flow-exit { display: none; }
+
+        @media (min-width: 1024px) {
+            .flow-entry, .flow-exit {
+                display: block;
+                position: absolute;
+                height: 4px;
+                background: linear-gradient(90deg, var(--cyan), var(--purple));
+                z-index: 1;
+            }
+            .flow-entry {
+                top: 50%;
+                left: -50px;
+                width: 50px;
+                transform: translateY(-50%);
+            }
+            .flow-exit {
+                top: 50%;
+                right: -50px;
+                width: 50px;
+                transform: translateY(-50%);
+            }
+            .flow-entry::after, .flow-exit::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background-image: radial-gradient(circle, rgba(255,255,255,0.9) 1.5px, transparent 2px);
+                background-size: 20px 4px;
+                animation: flowDotsRight 0.6s linear infinite;
+            }
         }
 
         /* Node Orbs */
@@ -358,12 +341,17 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .node-orb:hover {
+            transform: translate(-50%, -50%) scale(1.08);
         }
 
         .orb-ring {
             position: relative;
-            width: clamp(80px, 15vw, 110px);
-            height: clamp(80px, 15vw, 110px);
+            width: clamp(80px, 15vw, 100px);
+            height: clamp(80px, 15vw, 100px);
         }
 
         .orb-outer {
@@ -375,9 +363,7 @@
             opacity: 0.8;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .orb-inner {
             position: absolute;
@@ -410,10 +396,7 @@
             50% { opacity: 0.8; transform: scale(1.1); }
         }
 
-        .node-label {
-            margin-top: 12px;
-            text-align: center;
-        }
+        .node-label { margin-top: 12px; text-align: center; }
 
         .label-name {
             font-family: 'Syne', sans-serif;
@@ -429,20 +412,78 @@
         }
 
         /* Node Positions - Mobile */
-        #orb-atlas { top: 12%; left: 50%; }
-        #orb-merlin { top: 38%; left: 50%; }
-        #orb-argus { top: 64%; left: 50%; }
-        #orb-hephaestus { top: 90%; left: 50%; }
+        @media (max-width: 1023px) {
+            .architecture-stage { height: 520px; }
+            #orb-atlas { top: 10%; left: 50%; }
+            #orb-merlin { top: 35%; left: 50%; }
+            #orb-argus { top: 60%; left: 50%; }
+            #orb-hephaestus { top: 85%; left: 50%; }
+            .label-role { display: none; }
+            #line-trunk, #line-to-merlin, #line-to-argus, #line-to-hephaestus { display: none; }
+            #line-mobile-1, #line-mobile-2, #line-mobile-3 { display: block; }
+        }
 
         /* Node Positions - Desktop */
         @media (min-width: 1024px) {
-            #orb-atlas { top: 50%; left: 8%; }
-            #orb-merlin { top: 15%; left: 50%; }
-            #orb-argus { top: 85%; left: 38%; }
+            #orb-atlas { top: 50%; left: 12%; }
+            #orb-merlin { top: 15%; left: 55%; }
+            #orb-argus { top: 85%; left: 40%; }
             #orb-hephaestus { top: 85%; left: 75%; }
+
+            #line-trunk {
+                top: 50%;
+                left: 12%;
+                width: 83%;
+                transform: translateY(-50%);
+            }
+            #line-to-merlin {
+                left: 55%;
+                top: 15%;
+                height: calc(35% - 2px);
+                transform: translateX(-50%);
+            }
+            #line-to-argus {
+                left: 40%;
+                top: 50%;
+                height: 35%;
+                transform: translateX(-50%);
+            }
+            #line-to-hephaestus {
+                left: 75%;
+                top: 50%;
+                height: 35%;
+                transform: translateX(-50%);
+            }
+            #line-mobile-1, #line-mobile-2, #line-mobile-3 { display: none; }
         }
 
-        /* Floating Info Cards */
+        #line-mobile-1, #line-mobile-2, #line-mobile-3 { display: none; }
+
+        @media (max-width: 1023px) {
+            #line-mobile-1 {
+                display: block;
+                left: 50%;
+                top: 15%;
+                height: 15%;
+                transform: translateX(-50%);
+            }
+            #line-mobile-2 {
+                display: block;
+                left: 50%;
+                top: 40%;
+                height: 15%;
+                transform: translateX(-50%);
+            }
+            #line-mobile-3 {
+                display: block;
+                left: 50%;
+                top: 65%;
+                height: 15%;
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Tooltips */
         .info-card {
             position: absolute;
             width: clamp(200px, 28vw, 280px);
@@ -454,8 +495,9 @@
             opacity: 0;
             visibility: hidden;
             transform: translateY(10px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s ease;
             z-index: 100;
+            pointer-events: none;
         }
 
         .info-card.active {
@@ -471,39 +513,36 @@
             margin: 0;
         }
 
-        .info-card::before {
-            content: '';
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--cyan), var(--purple));
-            border-radius: 50%;
-            filter: blur(30px);
-            opacity: 0.5;
-            top: -10px;
-            left: -10px;
+        @media (min-width: 1024px) {
+            #info-atlas, #info-merlin {
+                bottom: calc(100% + 14px);
+                left: 50%;
+                transform: translateX(-50%) translateY(10px);
+            }
+            #info-atlas.active, #info-merlin.active { transform: translateX(-50%) translateY(0); }
+            #info-argus, #info-hephaestus {
+                top: calc(100% + 14px);
+                left: 50%;
+                transform: translateX(-50%) translateY(-10px);
+            }
+            #info-argus.active, #info-hephaestus.active { transform: translateX(-50%) translateY(0); }
+        }
+
+        @media (max-width: 1023px) {
+            .info-card { display: none; }
         }
 
         /* Outcomes Panel */
-        .outcomes-panel {
-            order: 3;
-        }
+        .outcomes-panel { order: 3; }
 
         .outcome-scroller {
             position: relative;
             height: clamp(160px, 22vh, 220px);
             overflow: hidden;
-            mask-image: linear-gradient(to bottom,
-                transparent 0%,
-                black 20%,
-                black 80%,
-                transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
         }
 
-        .outcome-list {
-            display: flex;
-            flex-direction: column;
-        }
+        .outcome-list { display: flex; flex-direction: column; }
 
         .outcome-entry {
             height: clamp(44px, 5.5vh, 56px);
@@ -514,7 +553,6 @@
             color: var(--text-dim);
             transition: all 0.5s ease;
             border-radius: 12px;
-            position: relative;
         }
 
         .outcome-entry.active {
@@ -525,14 +563,12 @@
 
         .outcome-entry.active::before {
             content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
             width: 4px;
-            height: 60%;
+            height: 24px;
             background: linear-gradient(to bottom, var(--cyan), var(--purple));
             border-radius: 2px;
+            margin-right: 14px;
+            flex-shrink: 0;
         }
 
         .outcome-badge {
@@ -549,20 +585,11 @@
             font-weight: 600;
         }
 
-        .outcome-badge i {
-            font-size: 16px;
-            animation: pulse 2s infinite;
-        }
+        .outcome-badge i { animation: pulse 2s infinite; }
 
-        /* Hide details on mobile */
-        @media (max-width: 1023px) {
-            .label-role {
-                display: none;
-            }
-
-            .info-card {
-                display: none;
-            }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
     </style>
 </head>
@@ -571,7 +598,6 @@
     <div class="bg-animation">
         <div class="gradient-orb orb-1"></div>
         <div class="gradient-orb orb-2"></div>
-        <div class="gradient-orb orb-3"></div>
     </div>
     <div class="noise-overlay"></div>
 
@@ -606,18 +632,18 @@
             <div class="diagram-panel">
                 <div class="architecture-stage" id="stage">
 
-                    <!-- SVG Connections -->
-                    <svg class="connection-lines" id="svg-lines" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#22d3ee" />
-                                <stop offset="50%" stop-color="#a855f7" />
-                                <stop offset="100%" stop-color="#ec4899" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
+                    <div class="flow-entry"></div>
+                    <div class="flow-exit"></div>
 
-                    <!-- Node Orbs -->
+                    <div id="line-trunk" class="flow-line flow-line-h"></div>
+                    <div id="line-to-merlin" class="flow-line flow-line-v flow-up"></div>
+                    <div id="line-to-argus" class="flow-line flow-line-v flow-down"></div>
+                    <div id="line-to-hephaestus" class="flow-line flow-line-v flow-down"></div>
+
+                    <div id="line-mobile-1" class="flow-line flow-line-v flow-down"></div>
+                    <div id="line-mobile-2" class="flow-line flow-line-v flow-down"></div>
+                    <div id="line-mobile-3" class="flow-line flow-line-v flow-down"></div>
+
                     <div class="node-orb" id="orb-atlas">
                         <div class="orb-ring">
                             <div class="orb-glow"></div>
@@ -629,6 +655,9 @@
                         <div class="node-label">
                             <div class="label-name">Atlas</div>
                             <div class="label-role">Data Integration</div>
+                        </div>
+                        <div class="info-card" id="info-atlas">
+                            <p>Efficiently ingests and normalizes diverse operational data, powering robust AI applications.</p>
                         </div>
                     </div>
 
@@ -642,7 +671,10 @@
                         </div>
                         <div class="node-label">
                             <div class="label-name">Merlin</div>
-                            <div class="label-role">Correlation & Insights</div>
+                            <div class="label-role">Correlation &amp; Insights</div>
+                        </div>
+                        <div class="info-card" id="info-merlin">
+                            <p>Delivers instant resolution context, linking symptoms to solutions with AI insights.</p>
                         </div>
                     </div>
 
@@ -658,6 +690,9 @@
                             <div class="label-name">Argus</div>
                             <div class="label-role">Noise Reduction</div>
                         </div>
+                        <div class="info-card" id="info-argus">
+                            <p>Proactively signals critical anomalies, cutting through telemetry noise for faster action.</p>
+                        </div>
                     </div>
 
                     <div class="node-orb" id="orb-hephaestus">
@@ -670,22 +705,11 @@
                         </div>
                         <div class="node-label">
                             <div class="label-name">Hephaestus</div>
-                            <div class="label-role">Action & Automation</div>
+                            <div class="label-role">Action &amp; Automation</div>
                         </div>
-                    </div>
-
-                    <!-- Info Cards -->
-                    <div class="info-card" id="info-atlas" style="bottom: 55%; left: 20%;">
-                        <p>Efficiently ingests and normalizes diverse operational data, powering robust AI applications.</p>
-                    </div>
-                    <div class="info-card" id="info-merlin" style="top: 5%; right: 5%;">
-                        <p>Delivers instant resolution context, linking symptoms to solutions with AI insights.</p>
-                    </div>
-                    <div class="info-card" id="info-argus" style="bottom: 5%; left: 5%;">
-                        <p>Proactively signals critical anomalies, cutting through telemetry noise for faster action.</p>
-                    </div>
-                    <div class="info-card" id="info-hephaestus" style="bottom: 5%; right: 5%;">
-                        <p>Achieves rapid resilience by automating fixes and resolving issues at machine speed.</p>
+                        <div class="info-card" id="info-hephaestus">
+                            <p>Achieves rapid resilience by automating fixes and resolving issues at machine speed.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -709,79 +733,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const svg = document.getElementById('svg-lines');
-            const stage = document.getElementById('stage');
-
-            function getNodeCenter(id) {
-                const node = document.getElementById(id);
-                const ring = node.querySelector('.orb-ring');
-                const rect = ring.getBoundingClientRect();
-                const stageRect = stage.getBoundingClientRect();
-
-                return {
-                    x: rect.left - stageRect.left + rect.width / 2,
-                    y: rect.top - stageRect.top + rect.height / 2
-                };
-            }
-
-            function drawLines() {
-                const isMobile = window.innerWidth < 1024;
-
-                svg.innerHTML = `
-                    <defs>
-                        <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="#22d3ee" />
-                            <stop offset="50%" stop-color="#a855f7" />
-                            <stop offset="100%" stop-color="#ec4899" />
-                        </linearGradient>
-                    </defs>
-                `;
-
-                const atlas = getNodeCenter('orb-atlas');
-                const merlin = getNodeCenter('orb-merlin');
-                const argus = getNodeCenter('orb-argus');
-                const hephaestus = getNodeCenter('orb-hephaestus');
-
-                const connections = isMobile ? [
-                    { from: atlas, to: merlin },
-                    { from: merlin, to: argus },
-                    { from: argus, to: hephaestus }
-                ] : [
-                    { from: atlas, to: merlin },
-                    { from: atlas, to: argus },
-                    { from: merlin, to: hephaestus },
-                    { from: argus, to: hephaestus }
-                ];
-
-                connections.forEach(conn => {
-                    const midX = (conn.from.x + conn.to.x) / 2;
-                    const midY = (conn.from.y + conn.to.y) / 2;
-                    const curve = isMobile ? 40 : 60;
-                    const d = `M ${conn.from.x} ${conn.from.y} Q ${midX + (conn.from.x < conn.to.x ? -curve : curve)} ${midY} ${conn.to.x} ${conn.to.y}`;
-
-                    // Glow
-                    const glow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    glow.setAttribute('class', 'flow-line-glow');
-                    glow.setAttribute('d', d);
-                    svg.appendChild(glow);
-
-                    // Main line
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    line.setAttribute('class', 'flow-line flow-line-animated');
-                    line.setAttribute('d', d);
-                    svg.appendChild(line);
-                });
-            }
-
-            setTimeout(drawLines, 100);
-
-            let resizeTimer;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(drawLines, 100);
-            });
-
-            // Info card cycling
             const orbIds = ['orb-atlas', 'orb-merlin', 'orb-argus', 'orb-hephaestus'];
             const infoIds = ['info-atlas', 'info-merlin', 'info-argus', 'info-hephaestus'];
             let currentInfo = 0;
@@ -815,19 +766,7 @@
                 cycleInfo();
             }
 
-            // Outcomes carousel
-            const outcomes = [
-                "Faster Incident Resolution",
-                "Enhanced Operational Efficiency",
-                "Improved System Reliability",
-                "Reduced Operational Costs",
-                "Context-aware Correlation",
-                "Real-time On-call Guidance",
-                "Predictive Log Analytics",
-                "Anomaly Detection",
-                "Root Cause Analysis"
-            ];
-
+            const outcomes = ["Faster Incident Resolution", "Enhanced Operational Efficiency", "Improved System Reliability", "Reduced Operational Costs", "Context-aware Correlation", "Real-time On-call Guidance", "Predictive Log Analytics", "Anomaly Detection", "Root Cause Analysis"];
             const list = document.getElementById('outcome-list');
             const tripled = [...outcomes, ...outcomes, ...outcomes];
 
@@ -851,7 +790,6 @@
             function advanceOutcome() {
                 outcomeIdx++;
                 updateOutcomes();
-
                 if (outcomeIdx >= outcomes.length * 2) {
                     setTimeout(() => {
                         list.style.transition = 'none';
