@@ -252,6 +252,8 @@
         .logo-card:nth-child(8) .logo-icon { color: #4A154B; }
         .logo-card:nth-child(9) .logo-icon { color: #0052CC; }
         .logo-card:nth-child(10) .logo-icon { color: #29B5E8; }
+        .logo-card:nth-child(11) .logo-icon { color: #f0f0f0; } /* GitHub */
+        .logo-card:nth-child(12) .logo-icon { color: #06AC38; } /* PagerDuty */
 
         /* Architecture Diagram Section */
         .diagram-section {
@@ -382,6 +384,13 @@
             line-height: 1.3;
         }
 
+        /* Merlin label above icon */
+        @media (min-width: 768px) {
+            #merlin-node { flex-direction: column-reverse; }
+            #merlin-node .node-label { margin-top: 0; margin-bottom: 8px; }
+            #merlin-node .node-description { order: -1; margin-bottom: 4px; }
+        }
+
         /* Node Positions - Mobile (Vertical) */
         #atlas-node { top: 15%; left: 50%; }
         #merlin-node { top: 40%; left: 50%; }
@@ -390,7 +399,7 @@
 
         /* Node Positions - Desktop (Pipeline Layout) */
         @media (min-width: 768px) {
-            #atlas-node { top: 50%; left: 12%; }
+            #atlas-node { top: 54%; left: 12%; }
             #merlin-node { top: 20%; left: 55%; }
             #argus-node { top: 80%; left: 40%; }
             #hephaestus-node { top: 80%; left: 75%; }
@@ -600,11 +609,13 @@
                     <div class="logo-card"><i class="fab fa-slack logo-icon" title="Slack"></i></div>
                     <div class="logo-card"><i class="fab fa-jira logo-icon" title="Jira"></i></div>
                     <div class="logo-card"><i class="fas fa-snowflake logo-icon" title="Snowflake"></i></div>
+                    <div class="logo-card"><i class="fab fa-github logo-icon" title="GitHub"></i></div>
+                    <div class="logo-card"><i class="fas fa-bell logo-icon" title="PagerDuty"></i></div>
                 </div>
 
                 <div class="status-bar">
                     <span class="status-dot"></span>
-                    <span class="status-text">10 integrations active</span>
+                    <span class="status-text">12 integrations active</span>
                 </div>
             </div>
 
