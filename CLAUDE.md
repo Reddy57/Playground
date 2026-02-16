@@ -4,13 +4,23 @@ Interactive visualization of the AIOps data pipeline showing data flow from Sour
 
 ## Project Structure
 
+### Dark Themes
 ```
 AIOps-Final.html              # Recommended - All fixes applied
 AIOps-Mission-Control.html    # "NASA control room" aesthetic
-AIOps-Complete-Flow.html      # Clean dark theme
+AIOps-Complete-Flow.html      # Clean dark theme with SVG arrows
 AIOps-Glass-Modern.html       # Glassmorphism with animated orbs
-AIOps-Premium-Light.html      # Light corporate theme
-AIOps-Responsive-Fixed.html   # Dark technical theme
+AIOps-Responsive-Fixed.html   # Dark technical theme with SVG lines
+```
+
+### Light Themes
+```
+AIOps-Final-Light.html          # Light version of AIOps-Final
+AIOps-Mission-Control-Light.html # Light version of Mission Control
+AIOps-Complete-Flow-Light.html   # Light version with SVG arrows
+AIOps-Glass-Modern-Light.html    # Light glassmorphism
+AIOps-Premium-Light.html         # Original light corporate theme
+AIOps-Responsive-Fixed-Light.html # Light technical theme
 ```
 
 Reference files (original):
@@ -89,6 +99,31 @@ Files updated:
 
 ---
 
+---
+
+## Light Theme Configuration
+
+Light themes use inverted color palettes:
+
+```css
+/* Light theme CSS variables */
+:root {
+    --void: #f8fafc;         /* Background - light slate */
+    --deep: #f1f5f9;         /* Secondary bg */
+    --panel: #ffffff;        /* Card/panel bg */
+    --surface: #e2e8f0;      /* Elevated surface */
+    --border: rgba(X, X, X, 0.2);      /* Border with brand color */
+    --signal: #0891b2;       /* Primary accent (darker for contrast) */
+    --text-bright: #0f172a;  /* Headings - dark */
+    --text-primary: #1e293b; /* Body text */
+    --text-muted: #64748b;   /* Secondary text */
+}
+```
+
+**Important:** GitHub icon uses `#24292f` on light themes (was `#f0f0f0` on dark).
+
+---
+
 ## Testing Checklist
 
 Before publishing, verify each file:
@@ -100,3 +135,4 @@ Before publishing, verify each file:
 - [ ] 12 source icons in complete grid
 - [ ] Engine icons loading from imgur
 - [ ] Responsive layout at mobile/desktop
+- [ ] Light themes have proper contrast and visible icons
