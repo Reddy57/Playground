@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIOps Flow - Modern Glass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-hover: rgba(255, 255, 255, 0.06);
+
+            --cyan: #22d3ee;
+            --purple: #a855f7;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --green: #22c55e;
+
+            --text-bright: #ffffff;
+            --text-mid: rgba(255, 255, 255, 0.8);
+            --text-dim: rgba(255, 255, 255, 0.5);
+            --text-faint: rgba(255, 255, 255, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0c0a1d 0%, #1a0a2e 30%, #0f172a 70%, #0a0f1a 100%);
+            min-height: 100vh;
+            color: var(--text-mid);
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .bg-animation {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 60vw;
+            height: 60vw;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            top: -30%;
+            left: -20%;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 50vw;
+            height: 50vw;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            bottom: -25%;
+            right: -15%;
+            animation-delay: -7s;
+        }
+
+        .orb-3 {
+            width: 35vw;
+            height: 35vw;
+            background: linear-gradient(135deg, var(--orange), var(--pink));
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -14s;
+            opacity: 0.2;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        /* Noise overlay */
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Main Layout */
+        .app-shell {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            padding: clamp(16px, 4vw, 48px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .layout-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(24px, 5vw, 48px);
+            max-width: 1500px;
+            margin: 0 auto;
+            width: 100%;
+            align-content: center;
+        }
+
+        @media (min-width: 1024px) {
+            .layout-grid {
+                grid-template-columns: 300px 1fr 300px;
+                align-items: center;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .layout-grid {
+                grid-template-columns: 340px 1fr 340px;
+            }
+        }
+
+        /* Glass Panels */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: clamp(20px, 3vw, 32px);
+            padding: clamp(24px, 4vw, 36px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent);
+        }
+
+        .panel-label {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(10px, 1.1vw, 12px);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: var(--cyan);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--cyan), transparent);
+            opacity: 0.3;
+        }
+
+        .panel-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(18px, 2.2vw, 28px);
+            font-weight: 800;
+            color: var(--text-bright);
+            margin-bottom: clamp(20px, 3vw, 32px);
+            line-height: 1.2;
+        }
+
+        /* Sources Grid */
+        .sources-panel { order: 1; }
+
+        @media (min-width: 1024px) {
+            .sources-panel { order: 1; }
+        }
+
+        .source-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: clamp(10px, 1.5vw, 14px);
+        }
+
+        @media (min-width: 1024px) {
+            .source-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .source-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .source-icon {
+            aspect-ratio: 1;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: clamp(12px, 2vw, 18px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .source-icon::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, var(--glass-hover), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .source-icon:hover {
+            transform: translateY(-4px) scale(1.05);
+            border-color: var(--cyan);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 40px rgba(34, 211, 238, 0.15);
+        }
+
+        .source-icon:hover::before {
+            opacity: 1;
+        }
+
+        .source-icon i {
+            font-size: clamp(20px, 2.5vw, 28px);
+            color: var(--text-dim);
+            transition: all 0.4s;
+            z-index: 1;
+        }
+
+        .source-icon:hover i {
+            color: var(--text-bright);
+            transform: scale(1.1);
+        }
+
+        /* Individual icon colors on hover */
+        .source-icon:nth-child(1):hover i { color: #ED1B24; }
+        .source-icon:nth-child(2):hover i { color: #FF9900; }
+        .source-icon:nth-child(3):hover i { color: #0078D4; }
+        .source-icon:nth-child(4):hover i { color: #FF3621; }
+        .source-icon:nth-child(5):hover i { color: #172B4D; }
+        .source-icon:nth-child(6):hover i { color: #34A853; }
+        .source-icon:nth-child(7):hover i { color: #00BFB3; }
+        .source-icon:nth-child(8):hover i { color: #4A154B; }
+        .source-icon:nth-child(9):hover i { color: #0052CC; }
+        .source-icon:nth-child(10):hover i { color: #29B5E8; }
+
+        .source-count {
+            margin-top: clamp(20px, 3vw, 28px);
+            padding-top: clamp(16px, 2vw, 20px);
+            border-top: 1px solid var(--glass-border);
+            font-size: clamp(12px, 1.3vw, 14px);
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .count-number {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(28px, 3vw, 40px);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Architecture Diagram */
+        .diagram-panel {
+            order: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(30px, 5vw, 60px);
+        }
+
+        .architecture-stage {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 1.1;
+        }
+
+        @media (min-width: 1024px) {
+            .architecture-stage {
+                aspect-ratio: 1.4;
+            }
+        }
+
+        /* SVG Lines */
+        .connection-lines {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        .flow-line {
+            fill: none;
+            stroke: url(#flowGradient);
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+
+        .flow-line-glow {
+            fill: none;
+            stroke: var(--cyan);
+            stroke-width: 12;
+            stroke-linecap: round;
+            opacity: 0.15;
+            filter: blur(8px);
+        }
+
+        .flow-line-animated {
+            stroke-dasharray: 15 10;
+            animation: dash 1s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -25; }
+        }
+
+        /* Node Orbs */
+        .node-orb {
+            position: absolute;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .orb-ring {
+            position: relative;
+            width: clamp(80px, 15vw, 110px);
+            height: clamp(80px, 15vw, 110px);
+        }
+
+        .orb-outer {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, var(--cyan), var(--purple), var(--pink), var(--cyan));
+            animation: spin 8s linear infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .orb-inner {
+            position: absolute;
+            inset: 4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a0a2e, #0c0a1d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .orb-inner img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        .orb-glow {
+            position: absolute;
+            inset: -20%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, transparent 70%);
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .node-label {
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .label-name {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(14px, 1.6vw, 18px);
+            font-weight: 700;
+            color: var(--text-bright);
+        }
+
+        .label-role {
+            font-size: clamp(10px, 1.1vw, 12px);
+            color: var(--text-dim);
+            max-width: 100px;
+        }
+
+        /* Node Positions - Mobile */
+        #orb-atlas { top: 12%; left: 50%; }
+        #orb-merlin { top: 38%; left: 50%; }
+        #orb-argus { top: 64%; left: 50%; }
+        #orb-hephaestus { top: 90%; left: 50%; }
+
+        /* Node Positions - Desktop */
+        @media (min-width: 1024px) {
+            #orb-atlas { top: 50%; left: 8%; }
+            #orb-merlin { top: 15%; left: 50%; }
+            #orb-argus { top: 85%; left: 38%; }
+            #orb-hephaestus { top: 85%; left: 75%; }
+        }
+
+        /* Floating Info Cards */
+        .info-card {
+            position: absolute;
+            width: clamp(200px, 28vw, 280px);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px 20px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        .info-card.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .info-card p {
+            font-size: clamp(12px, 1.2vw, 14px);
+            color: var(--text-mid);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            border-radius: 50%;
+            filter: blur(30px);
+            opacity: 0.5;
+            top: -10px;
+            left: -10px;
+        }
+
+        /* Outcomes Panel */
+        .outcomes-panel {
+            order: 3;
+        }
+
+        .outcome-scroller {
+            position: relative;
+            height: clamp(160px, 22vh, 220px);
+            overflow: hidden;
+            mask-image: linear-gradient(to bottom,
+                transparent 0%,
+                black 20%,
+                black 80%,
+                transparent 100%);
+        }
+
+        .outcome-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .outcome-entry {
+            height: clamp(44px, 5.5vh, 56px);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: clamp(14px, 1.4vw, 16px);
+            color: var(--text-dim);
+            transition: all 0.5s ease;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .outcome-entry.active {
+            color: var(--text-bright);
+            font-weight: 600;
+            background: linear-gradient(90deg, rgba(34, 211, 238, 0.1), transparent);
+        }
+
+        .outcome-entry.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: linear-gradient(to bottom, var(--cyan), var(--purple));
+            border-radius: 2px;
+        }
+
+        .outcome-badge {
+            margin-top: clamp(20px, 3vw, 28px);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            border-radius: 100px;
+            font-size: clamp(12px, 1.2vw, 14px);
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        .outcome-badge i {
+            font-size: 16px;
+            animation: pulse 2s infinite;
+        }
+
+        /* Hide details on mobile */
+        @media (max-width: 1023px) {
+            .label-role {
+                display: none;
+            }
+
+            .info-card {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+    <div class="noise-overlay"></div>
+
+    <div class="app-shell">
+        <div class="layout-grid">
+
+            <!-- Sources Panel -->
+            <div class="glass-panel sources-panel">
+                <span class="panel-label">Sources</span>
+                <h2 class="panel-title">Connected<br>Integrations</h2>
+
+                <div class="source-grid">
+                    <div class="source-icon"><i class="fas fa-server"></i></div>
+                    <div class="source-icon"><i class="fab fa-aws"></i></div>
+                    <div class="source-icon"><i class="fas fa-cloud"></i></div>
+                    <div class="source-icon"><i class="fas fa-cubes"></i></div>
+                    <div class="source-icon"><i class="fab fa-confluence"></i></div>
+                    <div class="source-icon"><i class="fab fa-google-drive"></i></div>
+                    <div class="source-icon"><i class="fas fa-database"></i></div>
+                    <div class="source-icon"><i class="fab fa-slack"></i></div>
+                    <div class="source-icon"><i class="fab fa-jira"></i></div>
+                    <div class="source-icon"><i class="fas fa-snowflake"></i></div>
+                </div>
+
+                <div class="source-count">
+                    <span class="count-number">10</span>
+                    <span>Active data<br>sources</span>
+                </div>
+            </div>
+
+            <!-- Architecture Diagram -->
+            <div class="diagram-panel">
+                <div class="architecture-stage" id="stage">
+
+                    <!-- SVG Connections -->
+                    <svg class="connection-lines" id="svg-lines" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#22d3ee" />
+                                <stop offset="50%" stop-color="#a855f7" />
+                                <stop offset="100%" stop-color="#ec4899" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+
+                    <!-- Node Orbs -->
+                    <div class="node-orb" id="orb-atlas">
+                        <div class="orb-ring">
+                            <div class="orb-glow"></div>
+                            <div class="orb-outer"></div>
+                            <div class="orb-inner">
+                                <img src="https://imgur.com/0ya7Fj7.png" alt="Atlas">
+                            </div>
+                        </div>
+                        <div class="node-label">
+                            <div class="label-name">Atlas</div>
+                            <div class="label-role">Data Integration</div>
+                        </div>
+                    </div>
+
+                    <div class="node-orb" id="orb-merlin">
+                        <div class="orb-ring">
+                            <div class="orb-glow"></div>
+                            <div class="orb-outer"></div>
+                            <div class="orb-inner">
+                                <img src="https://imgur.com/QyrDXOG.png" alt="Merlin">
+                            </div>
+                        </div>
+                        <div class="node-label">
+                            <div class="label-name">Merlin</div>
+                            <div class="label-role">Correlation & Insights</div>
+                        </div>
+                    </div>
+
+                    <div class="node-orb" id="orb-argus">
+                        <div class="orb-ring">
+                            <div class="orb-glow"></div>
+                            <div class="orb-outer"></div>
+                            <div class="orb-inner">
+                                <img src="https://imgur.com/xMcN4Yw.png" alt="Argus">
+                            </div>
+                        </div>
+                        <div class="node-label">
+                            <div class="label-name">Argus</div>
+                            <div class="label-role">Noise Reduction</div>
+                        </div>
+                    </div>
+
+                    <div class="node-orb" id="orb-hephaestus">
+                        <div class="orb-ring">
+                            <div class="orb-glow"></div>
+                            <div class="orb-outer"></div>
+                            <div class="orb-inner">
+                                <img src="https://imgur.com/7QbiKPT.png" alt="Hephaestus">
+                            </div>
+                        </div>
+                        <div class="node-label">
+                            <div class="label-name">Hephaestus</div>
+                            <div class="label-role">Action & Automation</div>
+                        </div>
+                    </div>
+
+                    <!-- Info Cards -->
+                    <div class="info-card" id="info-atlas" style="bottom: 55%; left: 20%;">
+                        <p>Efficiently ingests and normalizes diverse operational data, powering robust AI applications.</p>
+                    </div>
+                    <div class="info-card" id="info-merlin" style="top: 5%; right: 5%;">
+                        <p>Delivers instant resolution context, linking symptoms to solutions with AI insights.</p>
+                    </div>
+                    <div class="info-card" id="info-argus" style="bottom: 5%; left: 5%;">
+                        <p>Proactively signals critical anomalies, cutting through telemetry noise for faster action.</p>
+                    </div>
+                    <div class="info-card" id="info-hephaestus" style="bottom: 5%; right: 5%;">
+                        <p>Achieves rapid resilience by automating fixes and resolving issues at machine speed.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outcomes Panel -->
+            <div class="glass-panel outcomes-panel">
+                <span class="panel-label">Outcomes</span>
+                <h2 class="panel-title">Business<br>Impact</h2>
+
+                <div class="outcome-scroller">
+                    <div class="outcome-list" id="outcome-list"></div>
+                </div>
+
+                <div class="outcome-badge">
+                    <i class="fas fa-bolt"></i>
+                    Live metrics stream
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const svg = document.getElementById('svg-lines');
+            const stage = document.getElementById('stage');
+
+            function getNodeCenter(id) {
+                const node = document.getElementById(id);
+                const ring = node.querySelector('.orb-ring');
+                const rect = ring.getBoundingClientRect();
+                const stageRect = stage.getBoundingClientRect();
+
+                return {
+                    x: rect.left - stageRect.left + rect.width / 2,
+                    y: rect.top - stageRect.top + rect.height / 2
+                };
+            }
+
+            function drawLines() {
+                const isMobile = window.innerWidth < 1024;
+
+                svg.innerHTML = `
+                    <defs>
+                        <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#22d3ee" />
+                            <stop offset="50%" stop-color="#a855f7" />
+                            <stop offset="100%" stop-color="#ec4899" />
+                        </linearGradient>
+                    </defs>
+                `;
+
+                const atlas = getNodeCenter('orb-atlas');
+                const merlin = getNodeCenter('orb-merlin');
+                const argus = getNodeCenter('orb-argus');
+                const hephaestus = getNodeCenter('orb-hephaestus');
+
+                const connections = isMobile ? [
+                    { from: atlas, to: merlin },
+                    { from: merlin, to: argus },
+                    { from: argus, to: hephaestus }
+                ] : [
+                    { from: atlas, to: merlin },
+                    { from: atlas, to: argus },
+                    { from: merlin, to: hephaestus },
+                    { from: argus, to: hephaestus }
+                ];
+
+                connections.forEach(conn => {
+                    const midX = (conn.from.x + conn.to.x) / 2;
+                    const midY = (conn.from.y + conn.to.y) / 2;
+                    const curve = isMobile ? 40 : 60;
+                    const d = `M ${conn.from.x} ${conn.from.y} Q ${midX + (conn.from.x < conn.to.x ? -curve : curve)} ${midY} ${conn.to.x} ${conn.to.y}`;
+
+                    // Glow
+                    const glow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    glow.setAttribute('class', 'flow-line-glow');
+                    glow.setAttribute('d', d);
+                    svg.appendChild(glow);
+
+                    // Main line
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    line.setAttribute('class', 'flow-line flow-line-animated');
+                    line.setAttribute('d', d);
+                    svg.appendChild(line);
+                });
+            }
+
+            setTimeout(drawLines, 100);
+
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(drawLines, 100);
+            });
+
+            // Info card cycling
+            const orbIds = ['orb-atlas', 'orb-merlin', 'orb-argus', 'orb-hephaestus'];
+            const infoIds = ['info-atlas', 'info-merlin', 'info-argus', 'info-hephaestus'];
+            let currentInfo = 0;
+            let infoInterval;
+
+            function showInfo(index) {
+                infoIds.forEach((id, i) => {
+                    document.getElementById(id).classList.toggle('active', i === index);
+                });
+            }
+
+            function cycleInfo() {
+                if (window.innerWidth < 1024) return;
+                showInfo(currentInfo);
+                currentInfo = (currentInfo + 1) % orbIds.length;
+            }
+
+            orbIds.forEach((id, index) => {
+                const orb = document.getElementById(id);
+                orb.addEventListener('mouseenter', () => {
+                    clearInterval(infoInterval);
+                    showInfo(index);
+                });
+                orb.addEventListener('mouseleave', () => {
+                    infoInterval = setInterval(cycleInfo, 3500);
+                });
+            });
+
+            if (window.innerWidth >= 1024) {
+                infoInterval = setInterval(cycleInfo, 3500);
+                cycleInfo();
+            }
+
+            // Outcomes carousel
+            const outcomes = [
+                "Faster Incident Resolution",
+                "Enhanced Operational Efficiency",
+                "Improved System Reliability",
+                "Reduced Operational Costs",
+                "Context-aware Correlation",
+                "Real-time On-call Guidance",
+                "Predictive Log Analytics",
+                "Anomaly Detection",
+                "Root Cause Analysis"
+            ];
+
+            const list = document.getElementById('outcome-list');
+            const tripled = [...outcomes, ...outcomes, ...outcomes];
+
+            tripled.forEach(text => {
+                const item = document.createElement('div');
+                item.className = 'outcome-entry';
+                item.textContent = text;
+                list.appendChild(item);
+            });
+
+            let outcomeIdx = outcomes.length;
+            const entries = list.querySelectorAll('.outcome-entry');
+            const itemH = 50;
+
+            function updateOutcomes() {
+                list.style.transition = 'transform 0.6s ease';
+                list.style.transform = `translateY(-${outcomeIdx * itemH}px)`;
+                entries.forEach((e, i) => e.classList.toggle('active', i === outcomeIdx + 1));
+            }
+
+            function advanceOutcome() {
+                outcomeIdx++;
+                updateOutcomes();
+
+                if (outcomeIdx >= outcomes.length * 2) {
+                    setTimeout(() => {
+                        list.style.transition = 'none';
+                        outcomeIdx = outcomes.length;
+                        list.style.transform = `translateY(-${outcomeIdx * itemH}px)`;
+                    }, 600);
+                }
+            }
+
+            updateOutcomes();
+            setInterval(advanceOutcome, 3000);
+        });
+    </script>
+</body>
+</html>
