@@ -205,6 +205,8 @@
         .source-chip:nth-child(8) i { color: #4A154B; }
         .source-chip:nth-child(9) i { color: #0052CC; }
         .source-chip:nth-child(10) i { color: #29B5E8; }
+        .source-chip:nth-child(11) i { color: #f0f0f0; } /* GitHub */
+        .source-chip:nth-child(12) i { color: #06AC38; } /* PagerDuty */
 
         .source-count {
             margin-top: 16px;
@@ -318,16 +320,43 @@
 
             .flow-entry {
                 top: 50%;
-                left: -40px;
-                width: 40px;
+                left: calc(-4vw - 20px);
+                width: calc(4vw + 20px);
                 transform: translateY(-50%);
             }
 
             .flow-exit {
                 top: 50%;
-                right: -40px;
-                width: 40px;
+                right: calc(-4vw - 20px);
+                width: calc(4vw + 20px);
                 transform: translateY(-50%);
+            }
+
+            /* Arrow heads */
+            .flow-entry::before {
+                content: '';
+                position: absolute;
+                right: -10px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 0;
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent;
+                border-left: 12px solid var(--flow-color);
+            }
+
+            .flow-exit::before {
+                content: '';
+                position: absolute;
+                right: -10px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 0;
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent;
+                border-left: 12px solid var(--flow-color);
             }
         }
 
@@ -394,6 +423,12 @@
             text-align: center;
         }
 
+        /* Merlin label above icon */
+        @media (min-width: 1024px) {
+            #node-merlin { flex-direction: column-reverse; }
+            #node-merlin .node-info { margin-top: 0; margin-bottom: 10px; }
+        }
+
         .node-name {
             font-family: 'Space Mono', monospace;
             font-size: clamp(12px, 1.3vw, 14px);
@@ -435,7 +470,7 @@
 
         @media (min-width: 1024px) {
             #node-atlas {
-                top: 50%;
+                top: 54%;
                 left: 15%;
             }
             #node-merlin {
@@ -690,11 +725,13 @@
                     <div class="source-chip" title="Slack"><i class="fab fa-slack"></i></div>
                     <div class="source-chip" title="Jira"><i class="fab fa-jira"></i></div>
                     <div class="source-chip" title="Snowflake"><i class="fas fa-snowflake"></i></div>
+                    <div class="source-chip" title="GitHub"><i class="fab fa-github"></i></div>
+                    <div class="source-chip" title="PagerDuty"><i class="fas fa-bell"></i></div>
                 </div>
 
                 <div class="source-count">
                     <span class="dot"></span>
-                    <span>10 integrations active</span>
+                    <span>12 integrations active</span>
                 </div>
             </div>
 
