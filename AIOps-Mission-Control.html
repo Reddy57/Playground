@@ -194,6 +194,8 @@
         .source-chip:nth-child(8) i { color: #E01E5A; }
         .source-chip:nth-child(9) i { color: #0052CC; }
         .source-chip:nth-child(10) i { color: #29B5E8; }
+        .source-chip:nth-child(11) i { color: #f0f0f0; } /* GitHub */
+        .source-chip:nth-child(12) i { color: #06AC38; } /* PagerDuty */
 
         .source-status {
             margin-top: 16px;
@@ -303,14 +305,14 @@
             }
             .flow-entry {
                 top: 50%;
-                left: -50px;
-                width: 50px;
+                left: calc(-4vw - 20px);
+                width: calc(4vw + 20px);
                 transform: translateY(-50%);
             }
             .flow-exit {
                 top: 50%;
-                right: -50px;
-                width: 50px;
+                right: calc(-4vw - 20px);
+                width: calc(4vw + 20px);
                 transform: translateY(-50%);
             }
             .flow-entry::after, .flow-exit::after {
@@ -320,6 +322,31 @@
                 background-image: radial-gradient(circle, rgba(255,255,255,0.9) 1.5px, transparent 2px);
                 background-size: 20px 4px;
                 animation: flowDotsRight 0.6s linear infinite;
+            }
+            /* Arrow heads */
+            .flow-entry::before {
+                content: '';
+                position: absolute;
+                right: -10px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 0;
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent;
+                border-left: 12px solid var(--signal);
+            }
+            .flow-exit::before {
+                content: '';
+                position: absolute;
+                right: -10px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 0;
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent;
+                border-left: 12px solid var(--signal);
             }
         }
 
@@ -364,6 +391,12 @@
 
         .node-info { margin-top: 8px; text-align: center; }
 
+        /* Merlin label above icon */
+        @media (min-width: 1024px) {
+            #node-merlin { flex-direction: column-reverse; }
+            #node-merlin .node-info { margin-top: 0; margin-bottom: 8px; }
+        }
+
         .node-name {
             font-family: 'IBM Plex Mono', monospace;
             font-size: clamp(11px, 1.2vw, 13px);
@@ -393,7 +426,7 @@
 
         /* Node Positions - Desktop */
         @media (min-width: 1024px) {
-            #node-atlas { top: 50%; left: 12%; }
+            #node-atlas { top: 54%; left: 12%; }
             #node-merlin { top: 15%; left: 55%; }
             #node-argus { top: 85%; left: 42%; }
             #node-hephaestus { top: 85%; left: 75%; }
@@ -584,11 +617,13 @@
                     <div class="source-chip" title="Slack"><i class="fab fa-slack"></i></div>
                     <div class="source-chip" title="Jira"><i class="fab fa-jira"></i></div>
                     <div class="source-chip" title="Snowflake"><i class="fas fa-snowflake"></i></div>
+                    <div class="source-chip" title="GitHub"><i class="fab fa-github"></i></div>
+                    <div class="source-chip" title="PagerDuty"><i class="fas fa-bell"></i></div>
                 </div>
 
                 <div class="source-status">
                     <span class="status-dot"></span>
-                    <span>10 sources connected</span>
+                    <span>12 sources connected</span>
                 </div>
             </div>
 
