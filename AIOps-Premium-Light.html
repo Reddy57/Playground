@@ -485,6 +485,9 @@
 
         /* Arrow pointing into Outcomes - positioned at left edge of panel */
         @media (min-width: 900px) {
+            .outcomes-section {
+                overflow: visible; /* Allow arrow to show outside card */
+            }
             .outcomes-section::after {
                 content: '';
                 position: absolute;
