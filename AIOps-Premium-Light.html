@@ -24,6 +24,7 @@
             --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
             --shadow-glow: 0 0 40px rgba(14, 165, 233, 0.15);
+            --grid-gap: clamp(20px, 4vw, 40px);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -83,7 +84,7 @@
             margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr;
-            gap: clamp(20px, 4vw, 40px);
+            gap: var(--grid-gap);
         }
 
         @media (min-width: 900px) {
@@ -294,8 +295,19 @@
                 background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
                 z-index: 1;
             }
-            .flow-entry { top: 50%; left: calc(-8vw - 60px); width: calc(8vw + 60px); transform: translateY(-50%); }
-            .flow-exit { top: 50%; right: calc(-8vw - 60px); width: calc(8vw + 60px); transform: translateY(-50%); }
+            /* Flow lines span exactly the grid gap - starting from panel edge to diagram edge */
+            .flow-entry {
+                top: 50%;
+                left: calc(-1 * var(--grid-gap));
+                width: var(--grid-gap);
+                transform: translateY(-50%);
+            }
+            .flow-exit {
+                top: 50%;
+                right: calc(-1 * var(--grid-gap));
+                width: var(--grid-gap);
+                transform: translateY(-50%);
+            }
             .flow-entry::after, .flow-exit::after {
                 content: '';
                 position: absolute;
@@ -304,11 +316,11 @@
                 background-size: 20px 4px;
                 animation: flowRight 0.6s linear infinite;
             }
-            /* Arrow heads */
+            /* Arrow heads - positioned at the end of each flow line */
             .flow-entry::before {
                 content: '';
                 position: absolute;
-                right: -10px;
+                right: -1px;
                 top: 50%;
                 transform: translateY(-50%);
                 width: 0;
@@ -320,7 +332,7 @@
             .flow-exit::before {
                 content: '';
                 position: absolute;
-                right: -10px;
+                right: -1px;
                 top: 50%;
                 transform: translateY(-50%);
                 width: 0;
@@ -561,10 +573,6 @@
                     <div class="integration-chip"><i class="fas fa-bell"></i></div>
                 </div>
 
-                <p class="integration-count">
-                    <i class="fas fa-plug"></i>
-                    <strong>12</strong> active integrations
-                </p>
             </div>
 
             <!-- Architecture Diagram -->
@@ -645,10 +653,6 @@
                     <div class="outcome-track" id="outcome-track"></div>
                 </div>
 
-                <div class="outcome-badge">
-                    <i class="fas fa-chart-line"></i>
-                    Real-time analytics
-                </div>
             </div>
         </div>
     </div>
