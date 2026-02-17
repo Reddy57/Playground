@@ -200,18 +200,6 @@
         .logo-card:nth-child(9) i { color: #0052CC; }
         .logo-card:nth-child(10) i { color: #29B5E8; }
 
-        /* Fade overlay on left */
-        .logo-cloud::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 30%;
-            height: 100%;
-            background: linear-gradient(to right, var(--bg-base) 10%, transparent 100%);
-            pointer-events: none;
-            z-index: 2;
-        }
 
         /* Diagram Section */
         .diagram-section {
@@ -292,18 +280,17 @@
                 background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
                 z-index: 1;
             }
-            /* Flow lines extend from panel edge to trunk line - accounts for gap + centering offset */
-            /* Lines extend generously (200px) and go under the panels (which have higher z-index) */
+            /* Flow lines extend into the gap between panels and diagram */
             .flow-entry {
                 top: 50%;
-                left: -200px;
-                width: 200px;
+                left: calc(-1 * var(--grid-gap) - 20px);
+                width: calc(var(--grid-gap) + 20px);
                 transform: translateY(-50%);
             }
             .flow-exit {
                 top: 50%;
-                right: -200px;
-                width: 200px;
+                right: calc(-1 * var(--grid-gap) - 20px);
+                width: calc(var(--grid-gap) + 20px);
                 transform: translateY(-50%);
             }
             .flow-entry::after, .flow-exit::after {
@@ -494,7 +481,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 300px;
+            justify-content: center;
+            min-height: 280px;
         }
 
         .outcome-carousel {
@@ -502,7 +490,6 @@
             height: 150px;
             overflow: hidden;
             width: 100%;
-            margin-top: 1rem;
         }
 
         .outcome-track {
