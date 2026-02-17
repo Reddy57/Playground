@@ -505,11 +505,8 @@
 
         .outcome-carousel {
             position: relative;
-            height: 140px;
+            height: 150px;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .outcome-track {
@@ -518,18 +515,20 @@
             align-items: center;
             width: 100%;
             text-align: center;
+            transition: transform 0.6s ease;
         }
 
         .outcome-item {
-            height: 46px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0 8px;
             font-size: 14px;
             color: var(--text-muted);
-            transition: all 0.5s ease;
+            transition: all 0.4s ease;
             width: 100%;
+            flex-shrink: 0;
         }
 
         .outcome-item.active {
@@ -699,33 +698,56 @@
 
             const outcomes = ["Faster Incident Resolution", "Enhanced Operational Efficiency", "Improved System Reliability", "Reduced Operational Costs", "Context-aware Correlation", "Real-time On-call Guidance", "Predictive Log Analytics", "Anomaly Detection", "Root Cause Analysis"];
             const track = document.getElementById('outcome-track');
-            let currentIndex = 0;
 
-            function getOutcomeAt(index) {
-                // Wrap around for infinite loop
-                const len = outcomes.length;
-                return outcomes[((index % len) + len) % len];
-            }
+            // Triple the items for seamless infinite loop
+            const allOutcomes = [...outcomes, ...outcomes, ...outcomes];
 
-            function renderCarousel() {
-                track.innerHTML = '';
+            // Create all items
+            allOutcomes.forEach(text => {
+                const item = document.createElement('div');
+                item.className = 'outcome-item';
+                item.textContent = text;
+                track.appendChild(item);
+            });
 
-                // Show 3 items: previous, current (active), next
-                for (let offset = -1; offset <= 1; offset++) {
-                    const item = document.createElement('div');
-                    item.className = 'outcome-item';
-                    if (offset === 0) item.classList.add('active');
-                    item.textContent = getOutcomeAt(currentIndex + offset);
-                    track.appendChild(item);
+            const allItems = track.querySelectorAll('.outcome-item');
+            const itemHeight = 50;
+            const carouselHeight = 150;
+            let currentIdx = outcomes.length; // Start in middle set
+
+            function updateCarousel(animate = true) {
+                // Calculate position to center the active item
+                // Active item should be in the middle of the 150px container
+                // With 3 items showing (50px each), middle item starts at 50px
+                const offset = (currentIdx * itemHeight) - (carouselHeight - itemHeight) / 2;
+
+                if (animate) {
+                    track.style.transition = 'transform 0.6s ease';
+                } else {
+                    track.style.transition = 'none';
                 }
+                track.style.transform = `translateY(-${offset}px)`;
+
+                // Update active class
+                allItems.forEach((item, i) => {
+                    item.classList.toggle('active', i === currentIdx);
+                });
             }
 
             function advanceCarousel() {
-                currentIndex++;
-                renderCarousel();
+                currentIdx++;
+                updateCarousel(true);
+
+                // Reset to middle set when reaching end
+                if (currentIdx >= outcomes.length * 2) {
+                    setTimeout(() => {
+                        currentIdx = outcomes.length;
+                        updateCarousel(false);
+                    }, 600);
+                }
             }
 
-            renderCarousel();
+            updateCarousel(false);
             setInterval(advanceCarousel, 3000);
         });
     </script>
