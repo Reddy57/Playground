@@ -481,12 +481,17 @@
         }
 
         /* Outcomes Section */
-        .outcomes-section { order: 3; }
+        .outcomes-section {
+            order: 3;
+            display: flex;
+            flex-direction: column;
+        }
 
         /* Arrow pointing into Outcomes - positioned at left edge of panel */
         @media (min-width: 900px) {
             .outcomes-section {
                 overflow: visible; /* Allow arrow to show outside card */
+                min-height: 320px; /* Ensure consistent height */
             }
             .outcomes-section::after {
                 content: '';
@@ -504,7 +509,11 @@
         }
 
         .outcome-carousel {
-            position: relative;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
             height: 150px;
             overflow: hidden;
         }
