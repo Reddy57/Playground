@@ -94,49 +94,41 @@
             }
         }
 
-        /* Section Cards */
-        .section-card {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-default);
-            border-radius: 24px;
-            padding: clamp(20px, 3vw, 32px);
-            box-shadow: var(--shadow-md);
+        /* Section Panels - Open layout without boxes */
+        .section-panel {
             position: relative;
-            overflow: hidden;
-            z-index: 5;
-        }
-
-        .section-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 24px;
-            right: 24px;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-            border-radius: 0 0 4px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
         }
 
         .section-title {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(11px, 1.2vw, 13px);
-            font-weight: 600;
-            color: var(--accent-primary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
             text-transform: uppercase;
             letter-spacing: 0.15em;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 0.25rem;
+            text-align: center;
         }
 
-        .section-title::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: var(--accent-primary);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
+        .section-subtitle {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            text-align: center;
+            max-width: 200px;
+            line-height: 1.4;
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
         }
 
         @keyframes pulse {
@@ -144,77 +136,81 @@
             50% { opacity: 0.5; transform: scale(0.8); }
         }
 
-        .section-subtitle {
-            font-size: clamp(13px, 1.4vw, 15px);
-            color: var(--text-secondary);
-            margin-bottom: clamp(16px, 2.5vw, 24px);
-        }
-
-        /* Sources Section */
+        /* Sources Section - Floating Icons */
         .sources-section { order: 1; }
 
-        .integration-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: clamp(8px, 1vw, 12px);
+        .logo-cloud {
+            position: relative;
+            width: 100%;
+            height: 280px;
         }
 
-        @media (min-width: 900px) {
-            .integration-grid { grid-template-columns: repeat(4, 1fr); }
-        }
-
-        .integration-chip {
-            aspect-ratio: 1;
-            background: var(--bg-subtle);
-            border: 1px solid var(--border-default);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.25s ease;
-            cursor: pointer;
-        }
-
-        .integration-chip:hover {
+        .logo-card {
+            position: absolute;
             background: var(--bg-elevated);
-            border-color: var(--border-accent);
-            transform: translateY(-3px);
+            border-radius: 12px;
+            padding: 0.75rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 3.5rem;
+            height: 3.5rem;
+            z-index: 1;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: float 6s ease-in-out infinite;
+            border: 1px solid var(--border-default);
+        }
+
+        .logo-card:hover {
+            transform: translateY(-5px) scale(1.1);
             box-shadow: var(--shadow-lg), var(--shadow-glow);
         }
 
-        .integration-chip i {
-            font-size: clamp(18px, 2vw, 24px);
-            transition: transform 0.25s;
+        .logo-card.highlighted {
+            box-shadow: 0 0 20px 5px rgba(14, 165, 233, 0.3);
+            transform: scale(1.15);
         }
 
-        .integration-chip:hover i { transform: scale(1.1); }
-
-        /* Icon colors BY DEFAULT */
-        .integration-chip:nth-child(1) i { color: #ED1B24; }
-        .integration-chip:nth-child(2) i { color: #FF9900; }
-        .integration-chip:nth-child(3) i { color: #0078D4; }
-        .integration-chip:nth-child(4) i { color: #FF3621; }
-        .integration-chip:nth-child(5) i { color: #2684FF; }
-        .integration-chip:nth-child(6) i { color: #34A853; }
-        .integration-chip:nth-child(7) i { color: #00BFB3; }
-        .integration-chip:nth-child(8) i { color: #E01E5A; }
-        .integration-chip:nth-child(9) i { color: #0052CC; }
-        .integration-chip:nth-child(10) i { color: #29B5E8; }
-        .integration-chip:nth-child(11) i { color: #333333; } /* GitHub */
-        .integration-chip:nth-child(12) i { color: #06AC38; } /* PagerDuty */
-
-        .integration-count {
-            margin-top: clamp(12px, 2vw, 20px);
-            font-size: clamp(12px, 1.3vw, 14px);
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        .logo-card i {
+            font-size: 1.5rem;
         }
 
-        .integration-count strong {
-            color: var(--accent-primary);
-            font-weight: 600;
+        /* Icon positions - scattered layout */
+        .logo-card:nth-child(1) { top: 5%; left: 15%; animation-delay: 0s; }
+        .logo-card:nth-child(2) { top: 35%; left: 5%; animation-delay: -1s; }
+        .logo-card:nth-child(3) { top: 65%; left: 20%; animation-delay: -2s; }
+        .logo-card:nth-child(4) { top: 10%; left: 55%; animation-delay: -3s; }
+        .logo-card:nth-child(5) { top: 25%; left: 75%; animation-delay: -4s; }
+        .logo-card:nth-child(6) { top: 50%; left: 45%; animation-delay: -0.5s; }
+        .logo-card:nth-child(7) { top: 0%; left: 85%; animation-delay: -1.5s; }
+        .logo-card:nth-child(8) { top: 70%; left: 70%; animation-delay: -2.5s; }
+        .logo-card:nth-child(9) { top: 85%; left: 40%; animation-delay: -2s; }
+        .logo-card:nth-child(10) { top: 40%; left: 30%; animation-delay: -1.5s; }
+
+        /* Icon colors */
+        .logo-card:nth-child(1) i { color: #ED1B24; }
+        .logo-card:nth-child(2) i { color: #FF9900; }
+        .logo-card:nth-child(3) i { color: #0078D4; }
+        .logo-card:nth-child(4) i { color: #00BFB3; }
+        .logo-card:nth-child(5) i { color: #2684FF; }
+        .logo-card:nth-child(6) i { color: #34A853; }
+        .logo-card:nth-child(7) i { color: #FF3621; }
+        .logo-card:nth-child(8) i { color: #E01E5A; }
+        .logo-card:nth-child(9) i { color: #0052CC; }
+        .logo-card:nth-child(10) i { color: #29B5E8; }
+
+        /* Fade overlay on left */
+        .logo-cloud::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 30%;
+            height: 100%;
+            background: linear-gradient(to right, var(--bg-base) 10%, transparent 100%);
+            pointer-events: none;
+            z-index: 2;
         }
 
         /* Diagram Section */
@@ -332,7 +328,19 @@
                 border-bottom: 8px solid transparent;
                 border-left: 12px solid var(--accent-secondary);
             }
-            /* Exit arrow is added via .outcomes-section::after for proper z-index */
+            /* Exit arrow: at right end of exit line, pointing toward outcomes */
+            .flow-exit::before {
+                content: '';
+                position: absolute;
+                right: -1px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 0;
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent;
+                border-left: 12px solid var(--accent-secondary);
+            }
         }
 
         /* Engine Nodes */
@@ -485,37 +493,16 @@
             order: 3;
             display: flex;
             flex-direction: column;
-        }
-
-        /* Arrow pointing into Outcomes - positioned at left edge of panel */
-        @media (min-width: 900px) {
-            .outcomes-section {
-                overflow: visible; /* Allow arrow to show outside card */
-                min-height: 320px; /* Ensure consistent height */
-            }
-            .outcomes-section::after {
-                content: '';
-                position: absolute;
-                left: -12px;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 0;
-                height: 0;
-                border-top: 8px solid transparent;
-                border-bottom: 8px solid transparent;
-                border-left: 12px solid var(--accent-secondary);
-                z-index: 10;
-            }
+            align-items: center;
+            min-height: 300px;
         }
 
         .outcome-carousel {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
+            position: relative;
             height: 150px;
             overflow: hidden;
+            width: 100%;
+            margin-top: 1rem;
         }
 
         .outcome-track {
@@ -524,7 +511,7 @@
             align-items: center;
             width: 100%;
             text-align: center;
-            transition: transform 0.6s ease;
+            transition: transform 0.8s ease-in-out;
         }
 
         .outcome-item {
@@ -533,31 +520,19 @@
             align-items: center;
             justify-content: center;
             padding: 0 8px;
-            font-size: 14px;
+            font-size: 0.875rem;
             color: var(--text-muted);
-            transition: all 0.4s ease;
+            opacity: 0.7;
+            transition: all 0.5s ease;
             width: 100%;
             flex-shrink: 0;
         }
 
         .outcome-item.active {
             color: var(--text-primary);
-            font-weight: 700;
-            font-size: 17px;
-        }
-
-        .outcome-badge {
-            margin-top: clamp(16px, 2.5vw, 24px);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(14, 165, 233, 0.1));
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 100px;
-            font-size: clamp(11px, 1.2vw, 13px);
-            color: var(--accent-success);
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 1rem;
+            opacity: 1;
         }
     </style>
 </head>
@@ -572,25 +547,22 @@
         <div class="content-grid">
 
             <!-- Sources Panel -->
-            <div class="section-card sources-section">
+            <div class="section-panel sources-section">
                 <h2 class="section-title">Sources</h2>
-                <p class="section-subtitle">Harmonizing with your essential applications</p>
+                <p class="section-subtitle">Harmonizing with Your Essential Applications</p>
 
-                <div class="integration-grid">
-                    <div class="integration-chip"><i class="fas fa-server"></i></div>
-                    <div class="integration-chip"><i class="fab fa-aws"></i></div>
-                    <div class="integration-chip"><i class="fas fa-cloud"></i></div>
-                    <div class="integration-chip"><i class="fas fa-cubes"></i></div>
-                    <div class="integration-chip"><i class="fab fa-confluence"></i></div>
-                    <div class="integration-chip"><i class="fab fa-google-drive"></i></div>
-                    <div class="integration-chip"><i class="fas fa-database"></i></div>
-                    <div class="integration-chip"><i class="fab fa-slack"></i></div>
-                    <div class="integration-chip"><i class="fab fa-jira"></i></div>
-                    <div class="integration-chip"><i class="fas fa-snowflake"></i></div>
-                    <div class="integration-chip"><i class="fab fa-github"></i></div>
-                    <div class="integration-chip"><i class="fas fa-bell"></i></div>
+                <div class="logo-cloud" id="logo-cloud">
+                    <div class="logo-card"><i class="fas fa-server"></i></div>
+                    <div class="logo-card"><i class="fab fa-aws"></i></div>
+                    <div class="logo-card"><i class="fas fa-cloud"></i></div>
+                    <div class="logo-card"><i class="fas fa-database"></i></div>
+                    <div class="logo-card"><i class="fab fa-confluence"></i></div>
+                    <div class="logo-card"><i class="fab fa-google-drive"></i></div>
+                    <div class="logo-card"><i class="fas fa-cubes"></i></div>
+                    <div class="logo-card"><i class="fab fa-slack"></i></div>
+                    <div class="logo-card"><i class="fab fa-jira"></i></div>
+                    <div class="logo-card"><i class="fas fa-snowflake"></i></div>
                 </div>
-
             </div>
 
             <!-- Architecture Diagram -->
@@ -663,14 +635,13 @@
             </div>
 
             <!-- Outcomes Panel -->
-            <div class="section-card outcomes-section">
+            <div class="section-panel outcomes-section">
                 <h2 class="section-title">Outcomes</h2>
-                <p class="section-subtitle">Value realized by your business</p>
+                <p class="section-subtitle">Value Realized by Business</p>
 
                 <div class="outcome-carousel">
                     <div class="outcome-track" id="outcome-track"></div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -757,7 +728,28 @@
             }
 
             updateCarousel(false);
-            setInterval(advanceCarousel, 3000);
+            setInterval(advanceCarousel, 3500);
+
+            // Logo cloud random highlighting
+            const logoCards = document.querySelectorAll('.logo-card');
+            let lastHighlightedIdx = -1;
+
+            function highlightRandomLogo() {
+                // Remove previous highlight
+                logoCards.forEach(card => card.classList.remove('highlighted'));
+
+                // Pick a random card (different from last)
+                let newIdx;
+                do {
+                    newIdx = Math.floor(Math.random() * logoCards.length);
+                } while (newIdx === lastHighlightedIdx && logoCards.length > 1);
+
+                lastHighlightedIdx = newIdx;
+                logoCards[newIdx].classList.add('highlighted');
+            }
+
+            highlightRandomLogo();
+            setInterval(highlightRandomLogo, 2000);
         });
     </script>
 </body>
