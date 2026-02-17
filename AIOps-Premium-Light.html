@@ -505,47 +505,37 @@
 
         .outcome-carousel {
             position: relative;
-            height: 180px;
+            height: 140px;
             overflow: hidden;
             display: flex;
             align-items: center;
+            justify-content: center;
         }
 
         .outcome-track {
             display: flex;
             flex-direction: column;
+            align-items: center;
             width: 100%;
+            text-align: center;
         }
 
         .outcome-item {
-            height: 36px;
+            height: 46px;
             display: flex;
             align-items: center;
-            padding: 0 12px;
-            font-size: 13px;
+            justify-content: center;
+            padding: 0 8px;
+            font-size: 14px;
             color: var(--text-muted);
             transition: all 0.5s ease;
-            border-radius: 8px;
-            opacity: 0.4;
-            transform: scale(0.95);
+            width: 100%;
         }
 
         .outcome-item.active {
-            background: linear-gradient(90deg, rgba(14, 165, 233, 0.15), rgba(99, 102, 241, 0.05));
             color: var(--text-primary);
-            font-weight: 600;
-            font-size: 15px;
-            height: 44px;
-            opacity: 1;
-            transform: scale(1);
-            border-left: 3px solid var(--accent-primary);
-            padding-left: 12px;
-            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
-        }
-
-        .outcome-item.near {
-            opacity: 0.7;
-            transform: scale(0.98);
+            font-weight: 700;
+            font-size: 17px;
         }
 
         .outcome-badge {
@@ -709,59 +699,33 @@
 
             const outcomes = ["Faster Incident Resolution", "Enhanced Operational Efficiency", "Improved System Reliability", "Reduced Operational Costs", "Context-aware Correlation", "Real-time On-call Guidance", "Predictive Log Analytics", "Anomaly Detection", "Root Cause Analysis"];
             const track = document.getElementById('outcome-track');
-            const tripled = [...outcomes, ...outcomes, ...outcomes];
+            let currentIndex = 0;
 
-            tripled.forEach(text => {
-                const item = document.createElement('div');
-                item.className = 'outcome-item';
-                item.textContent = text;
-                track.appendChild(item);
-            });
+            function getOutcomeAt(index) {
+                // Wrap around for infinite loop
+                const len = outcomes.length;
+                return outcomes[((index % len) + len) % len];
+            }
 
-            const allItems = track.querySelectorAll('.outcome-item');
-            let idx = outcomes.length;
-            const itemHeight = 36; // Base item height
-            const activeHeight = 44; // Active item height
-            const carouselHeight = 180;
+            function renderCarousel() {
+                track.innerHTML = '';
 
-            function updateCarousel() {
-                // Calculate offset to center the active item
-                // Active item is at position idx, we want it centered in the 180px container
-                const itemsBeforeActive = idx;
-                const offsetToActive = itemsBeforeActive * itemHeight;
-                const centerOffset = (carouselHeight - activeHeight) / 2;
-                const translateY = offsetToActive - centerOffset;
-
-                track.style.transition = 'transform 0.5s ease';
-                track.style.transform = `translateY(-${translateY}px)`;
-
-                allItems.forEach((item, i) => {
-                    item.classList.remove('active', 'near');
-                    if (i === idx) {
-                        item.classList.add('active');
-                    } else if (i === idx - 1 || i === idx + 1) {
-                        item.classList.add('near');
-                    }
-                });
+                // Show 3 items: previous, current (active), next
+                for (let offset = -1; offset <= 1; offset++) {
+                    const item = document.createElement('div');
+                    item.className = 'outcome-item';
+                    if (offset === 0) item.classList.add('active');
+                    item.textContent = getOutcomeAt(currentIndex + offset);
+                    track.appendChild(item);
+                }
             }
 
             function advanceCarousel() {
-                idx++;
-                if (idx >= outcomes.length * 2) {
-                    // Reset without animation
-                    track.style.transition = 'none';
-                    idx = outcomes.length;
-                    const itemsBeforeActive = idx;
-                    const offsetToActive = itemsBeforeActive * itemHeight;
-                    const centerOffset = (carouselHeight - activeHeight) / 2;
-                    track.style.transform = `translateY(-${offsetToActive - centerOffset}px)`;
-                    // Force reflow
-                    track.offsetHeight;
-                }
-                updateCarousel();
+                currentIndex++;
+                renderCarousel();
             }
 
-            updateCarousel();
+            renderCarousel();
             setInterval(advanceCarousel, 3000);
         });
     </script>
