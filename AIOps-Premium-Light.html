@@ -505,39 +505,47 @@
 
         .outcome-carousel {
             position: relative;
-            height: clamp(140px, 20vh, 200px);
+            height: 180px;
             overflow: hidden;
-            mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
-        }
-
-        .outcome-track { display: flex; flex-direction: column; }
-
-        .outcome-item {
-            height: clamp(40px, 5vh, 50px);
             display: flex;
             align-items: center;
-            padding: 0 16px;
-            font-size: clamp(13px, 1.3vw, 15px);
+        }
+
+        .outcome-track {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .outcome-item {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 13px;
             color: var(--text-muted);
-            transition: all 0.4s ease;
+            transition: all 0.5s ease;
             border-radius: 8px;
-            margin: 2px 0;
+            opacity: 0.4;
+            transform: scale(0.95);
         }
 
         .outcome-item.active {
-            background: linear-gradient(90deg, rgba(14, 165, 233, 0.1), transparent);
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.15), rgba(99, 102, 241, 0.05));
             color: var(--text-primary);
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 15px;
+            height: 44px;
+            opacity: 1;
+            transform: scale(1);
+            border-left: 3px solid var(--accent-primary);
+            padding-left: 12px;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
         }
 
-        .outcome-item.active::before {
-            content: '';
-            width: 4px;
-            height: 24px;
-            background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary));
-            border-radius: 2px;
-            margin-right: 12px;
-            flex-shrink: 0;
+        .outcome-item.near {
+            opacity: 0.7;
+            transform: scale(0.98);
         }
 
         .outcome-badge {
@@ -712,24 +720,45 @@
 
             const allItems = track.querySelectorAll('.outcome-item');
             let idx = outcomes.length;
-            const itemHeight = 44;
+            const itemHeight = 36; // Base item height
+            const activeHeight = 44; // Active item height
+            const carouselHeight = 180;
 
             function updateCarousel() {
+                // Calculate offset to center the active item
+                // Active item is at position idx, we want it centered in the 180px container
+                const itemsBeforeActive = idx;
+                const offsetToActive = itemsBeforeActive * itemHeight;
+                const centerOffset = (carouselHeight - activeHeight) / 2;
+                const translateY = offsetToActive - centerOffset;
+
                 track.style.transition = 'transform 0.5s ease';
-                track.style.transform = `translateY(-${idx * itemHeight}px)`;
-                allItems.forEach((item, i) => item.classList.toggle('active', i === idx + 1));
+                track.style.transform = `translateY(-${translateY}px)`;
+
+                allItems.forEach((item, i) => {
+                    item.classList.remove('active', 'near');
+                    if (i === idx) {
+                        item.classList.add('active');
+                    } else if (i === idx - 1 || i === idx + 1) {
+                        item.classList.add('near');
+                    }
+                });
             }
 
             function advanceCarousel() {
                 idx++;
-                updateCarousel();
                 if (idx >= outcomes.length * 2) {
-                    setTimeout(() => {
-                        track.style.transition = 'none';
-                        idx = outcomes.length;
-                        track.style.transform = `translateY(-${idx * itemHeight}px)`;
-                    }, 500);
+                    // Reset without animation
+                    track.style.transition = 'none';
+                    idx = outcomes.length;
+                    const itemsBeforeActive = idx;
+                    const offsetToActive = itemsBeforeActive * itemHeight;
+                    const centerOffset = (carouselHeight - activeHeight) / 2;
+                    track.style.transform = `translateY(-${offsetToActive - centerOffset}px)`;
+                    // Force reflow
+                    track.offsetHeight;
                 }
+                updateCarousel();
             }
 
             updateCarousel();
