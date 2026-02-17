@@ -103,6 +103,7 @@
             box-shadow: var(--shadow-md);
             position: relative;
             overflow: hidden;
+            z-index: 5;
         }
 
         .section-card::before {
@@ -295,17 +296,18 @@
                 background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
                 z-index: 1;
             }
-            /* Flow lines span exactly the grid gap - starting from panel edge to diagram edge */
+            /* Flow lines extend from panel edge to trunk line - accounts for gap + centering offset */
+            /* Lines extend generously (200px) and go under the panels (which have higher z-index) */
             .flow-entry {
                 top: 50%;
-                left: calc(-1 * var(--grid-gap));
-                width: var(--grid-gap);
+                left: -200px;
+                width: 200px;
                 transform: translateY(-50%);
             }
             .flow-exit {
                 top: 50%;
-                right: calc(-1 * var(--grid-gap));
-                width: var(--grid-gap);
+                right: -200px;
+                width: 200px;
                 transform: translateY(-50%);
             }
             .flow-entry::after, .flow-exit::after {
@@ -316,7 +318,7 @@
                 background-size: 20px 4px;
                 animation: flowRight 0.6s linear infinite;
             }
-            /* Arrow heads - positioned at the end of each flow line */
+            /* Arrow heads - positioned at the end of each flow line pointing into diagram */
             .flow-entry::before {
                 content: '';
                 position: absolute;
