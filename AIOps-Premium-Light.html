@@ -332,19 +332,7 @@
                 border-bottom: 8px solid transparent;
                 border-left: 12px solid var(--accent-secondary);
             }
-            /* Exit arrow: at left end of exit line (visible), pointing toward Outcomes */
-            .flow-exit::before {
-                content: '';
-                position: absolute;
-                left: 0;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 0;
-                height: 0;
-                border-top: 8px solid transparent;
-                border-bottom: 8px solid transparent;
-                border-left: 12px solid var(--accent-secondary);
-            }
+            /* Exit arrow is added via .outcomes-section::after for proper z-index */
         }
 
         /* Engine Nodes */
@@ -494,6 +482,23 @@
 
         /* Outcomes Section */
         .outcomes-section { order: 3; }
+
+        /* Arrow pointing into Outcomes - positioned at left edge of panel */
+        @media (min-width: 900px) {
+            .outcomes-section::after {
+                content: '';
+                position: absolute;
+                left: -12px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 0;
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent;
+                border-left: 12px solid var(--accent-secondary);
+                z-index: 10;
+            }
+        }
 
         .outcome-carousel {
             position: relative;
